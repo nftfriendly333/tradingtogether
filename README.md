@@ -63,8 +63,11 @@
   .item-price.up{color:#5deb8f}.item-price.down{color:#ff6b6b}
   .item-change{font-size:.68rem;margin-top:2px;font-weight:600}
   .item-change.pos{color:var(--green)}.item-change.neg{color:var(--red)}
-  .chart-wrap{padding:6px 12px 5px;border-bottom:1px solid rgba(107,74,34,.4)}
-  canvas.price-chart{width:100%;height:70px;display:block;border-radius:4px}
+  .chart-wrap{padding:6px 12px 5px;border-bottom:1px solid rgba(107,74,34,.4);position:relative}
+  canvas.price-chart{width:100%;height:180px;display:block;border-radius:4px}
+  .chart-ohlc-bar{font-size:.62rem;color:var(--text-dim);padding:4px 2px 2px;font-family:monospace;
+    display:flex;gap:8px;flex-wrap:wrap}
+  .chart-ohlc-bar span{font-weight:700}
 
   .open-pos-bar{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:5px 12px;
     border-bottom:1px solid rgba(107,74,34,.3);background:rgba(0,0,0,.15)}
@@ -234,7 +237,67 @@
     color:#ffb3b3;cursor:pointer;transition:all .15s;text-transform:uppercase;letter-spacing:1px}
   .warning-btn-confirm:hover{background:linear-gradient(135deg,#7d2020,#5c1212);box-shadow:0 0 10px rgba(192,57,43,.3)}
 
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:300;display:flex;
+  /* BREAKING NEWS BANNER */
+  .breaking-news{position:fixed;top:0;left:0;right:0;z-index:600;transform:translateY(-100%);
+    transition:transform .5s cubic-bezier(.34,1.2,.64,1)}
+  .breaking-news.show{transform:translateY(0)}
+  .bn-bar{background:linear-gradient(135deg,#8b0000,#c0392b,#8b0000);
+    border-bottom:3px solid #ff4444;padding:0;overflow:hidden;position:relative}
+  .bn-bar::before{content:'';position:absolute;inset:0;
+    background:repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(255,255,255,.04) 40px,rgba(255,255,255,.04) 41px);
+    pointer-events:none}
+  .bn-inner{display:flex;align-items:stretch}
+  .bn-label{background:#ff0000;color:#fff;font-family:'Cinzel',serif;font-size:.75rem;font-weight:700;
+    letter-spacing:2px;padding:10px 14px;text-transform:uppercase;flex-shrink:0;
+    display:flex;align-items:center;gap:6px;animation:bnLabelPulse 1s ease-in-out infinite}
+  @keyframes bnLabelPulse{0%,100%{background:#ff0000}50%{background:#cc0000}}
+  .bn-content{flex:1;padding:8px 14px;overflow:hidden}
+  .bn-headline{font-family:'Cinzel',serif;font-size:.88rem;color:#fff;font-weight:700;
+    letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bn-sub{font-size:.7rem;color:rgba(255,220,220,.8);margin-top:2px;font-style:italic}
+  .bn-close{background:rgba(0,0,0,.3);border:none;color:rgba(255,255,255,.7);font-size:1.2rem;
+    padding:0 14px;cursor:pointer;flex-shrink:0;transition:color .15s}
+  .bn-close:hover{color:#fff}
+  .bn-countdown{font-family:'Cinzel',serif;font-size:.65rem;color:rgba(255,200,200,.8);
+    padding:0 12px;display:flex;align-items:center;letter-spacing:1px;flex-shrink:0}
+
+  /* CHART STROBE */
+  .chart-wrap{position:relative}
+  .strobe-overlay{position:absolute;inset:0;border-radius:4px;pointer-events:none;opacity:0;
+    transition:opacity .08s;z-index:2}
+  .strobe-overlay.flash-green{background:radial-gradient(ellipse at center,rgba(39,174,96,.35) 0%,transparent 70%)}
+  .strobe-overlay.flash-red{background:radial-gradient(ellipse at center,rgba(192,57,43,.35) 0%,transparent 70%)}
+  @keyframes strobeGlow{0%{box-shadow:0 0 0 0 transparent}
+    50%{box-shadow:0 0 20px 4px rgba(240,192,64,.3)}
+    100%{box-shadow:0 0 0 0 transparent}}
+  .item-card.strobe-active{animation:strobeGlow .6s ease-out}
+
+  /* CLOSE ALL BUTTON */
+  .btn-close-all{display:block;width:100%;margin:12px 0 4px;
+    background:linear-gradient(135deg,#5c1a1a,#3d0f0f);border:2px solid #c0392b;
+    border-radius:8px;padding:11px;font-family:'Cinzel',serif;font-size:.8rem;font-weight:700;
+    color:#ffb3b3;cursor:pointer;transition:all .15s;text-align:center;letter-spacing:1px;text-transform:uppercase}
+  .btn-close-all:hover{background:linear-gradient(135deg,#6b2020,#4d1212);box-shadow:0 0 14px rgba(192,57,43,.35)}
+  .btn-close-all:active{transform:scale(.97)}
+
+  /* MINI CLOSE BUTTON ON MARKET CARD */
+  .market-close-row{display:flex;gap:6px;padding:6px 12px 8px;align-items:center}
+  .market-close-row .btn-trade{margin:0;flex:1;padding:8px 4px;font-size:.7rem}
+  .btn-close-item{flex-shrink:0;background:rgba(192,57,43,.12);border:1px solid rgba(192,57,43,.4);
+    border-radius:6px;padding:8px 12px;font-family:'Cinzel',serif;font-size:.65rem;font-weight:600;
+    color:#ffb3b3;cursor:pointer;transition:all .15s;text-align:center;letter-spacing:.5px;white-space:nowrap}
+  .btn-close-item:hover{background:rgba(192,57,43,.25);border-color:#c0392b}
+  .btn-close-item:active{transform:scale(.96)}
+  .btn-close-item:disabled{opacity:.25;cursor:not-allowed}
+
+  /* TREND SHIFT INDICATOR on cards */
+  .trend-badge{display:inline-flex;align-items:center;gap:3px;font-size:.6rem;
+    padding:1px 6px;border-radius:8px;font-weight:700;letter-spacing:.5px}
+  .trend-badge.bull{background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.4);color:#7fffc4}
+  .trend-badge.bear{background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.4);color:#ffb3b3}
+  .trend-badge.flat{background:rgba(107,74,34,.2);border:1px solid rgba(107,74,34,.4);color:var(--text-dim)}
+
+
     align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
   .modal-overlay.open{opacity:1;pointer-events:all}
   .modal{background:linear-gradient(180deg,#3d2510,#2d1a0a);border:2px solid var(--gold-dark);
@@ -304,6 +367,21 @@
 </head>
 <body>
 
+<!-- BREAKING NEWS BANNER -->
+<div class="breaking-news" id="breaking-news">
+  <div class="bn-bar">
+    <div class="bn-inner">
+      <div class="bn-label">📡 Breaking</div>
+      <div class="bn-content">
+        <div class="bn-headline" id="bn-headline">Market conditions shifting...</div>
+        <div class="bn-sub" id="bn-sub">Trend bias randomised across all assets</div>
+      </div>
+      <div class="bn-countdown" id="bn-countdown"></div>
+      <button class="bn-close" onclick="dismissNews()">✕</button>
+    </div>
+  </div>
+</div>
+
 <div class="header">
   <div class="header-title">⚔ Trade Together ⚔</div>
   <div class="header-subtitle">Leveraged Commodity Exchange</div>
@@ -317,7 +395,6 @@
 <div class="tabs">
   <div class="tab active" onclick="showPage('market')">🏪 Market</div>
   <div class="tab" onclick="showPage('portfolio')">📦 Positions</div>
-  <div class="tab" onclick="showPage('charts')">📈 Charts</div>
   <div class="tab" onclick="showPage('history')">📜 History</div>
 </div>
 
@@ -325,12 +402,19 @@
   <div class="main">
     <div class="market-header">
       <div class="section-title">Live Market</div>
-      <div class="tick-indicator">
-        <div class="tick-dot" id="tick-dot"></div>
-        <span id="tick-label">Live</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="chart-toggle-btns">
+          <button class="chart-tog-btn active" id="tog-candle" onclick="setChartMode('candle')">🕯</button>
+          <button class="chart-tog-btn" id="tog-line" onclick="setChartMode('line')">📈</button>
+        </div>
+        <div class="tick-indicator">
+          <div class="tick-dot" id="tick-dot"></div>
+          <span id="tick-label">Live</span>
+        </div>
       </div>
     </div>
     <div id="market-items"></div>
+    <div id="market-close-all-wrap"></div>
   </div>
 </div>
 
@@ -356,13 +440,6 @@
   </div>
 </div>
 
-<div id="page-charts" class="page">
-  <div class="main">
-    <div class="section-title" style="margin-bottom:10px;">📊 Price History</div>
-    <div id="charts-list"></div>
-  </div>
-</div>
-
 <div id="page-history" class="page">
   <div class="main">
     <div class="hist-stats-grid" id="hist-stats"></div>
@@ -374,6 +451,9 @@
           <option value="sword">Longsword</option>
           <option value="rune">Fire Rune</option>
           <option value="potion">Potion</option>
+          <option value="gem">Onyx Gem</option>
+          <option value="hide">Dragon Hide</option>
+          <option value="arrow">Rune Arrow</option>
         </select>
         <select class="hist-select" id="hist-filter-outcome" onchange="renderHistory()">
           <option value="all">All Results</option>
@@ -452,17 +532,37 @@
 
 <script>
 var ITEMS = [
-  { id:'sword',  name:'Dragon Longsword',    desc:'A fearsome blade of dragonite',    icon:'⚔️', price:220, volatility:0.05, trend:0.001,  history:[] },
-  { id:'rune',   name:'Fire Rune Bundle',    desc:'Ancient runes pulsing with flame', icon:'🔥', price:85,  volatility:0.08, trend:-0.001, history:[] },
-  { id:'potion', name:'Super Restore Potion',desc:'Restores stats drained in battle', icon:'🧪', price:150, volatility:0.04, trend:0.002,  history:[] }
+  { id:'sword',  name:'Dragon Longsword',    desc:'A fearsome blade of dragonite',    icon:'⚔️', price:220, volatility:0.0625, trend:0.001,  history:[], candles:[], candleTickBuf:[] },
+  { id:'rune',   name:'Fire Rune Bundle',    desc:'Ancient runes pulsing with flame', icon:'🔥', price:85,  volatility:0.1000, trend:-0.001, history:[], candles:[], candleTickBuf:[] },
+  { id:'potion', name:'Super Restore Potion',desc:'Restores stats drained in battle', icon:'🧪', price:150, volatility:0.0500, trend:0.002,  history:[], candles:[], candleTickBuf:[] },
+  { id:'gem',    name:'Onyx Gem',            desc:'Rare gemstone from deep mines',    icon:'💎', price:310, volatility:0,       trend:0,      history:[], candles:[], candleTickBuf:[] },
+  { id:'hide',   name:'Dragon Leather Hide', desc:'Tanned hide of a slain dragon',   icon:'🐉', price:175, volatility:0,       trend:0,      history:[], candles:[], candleTickBuf:[] },
+  { id:'arrow',  name:'Rune Arrow Bundle',   desc:'Magically tipped arrows of rune', icon:'🏹', price:55,  volatility:0,       trend:0,      history:[], candles:[], candleTickBuf:[] }
 ];
 
-var MAX_HISTORY  = 60;   // raw price ticks kept
-var TICK_MS      = 2000; // price updates every 2s
-var CANDLE_TICKS = 3;    // 3 ticks x 2s = 6s per candle
-var MA_PERIOD    = 20;   // 20-candle moving average
-var STARTING_GP  = 1000;
-var MARGIN_RATE  = 0.2;
+// Randomize volatility, trend, and starting price for the 3 new items at startup
+(function() {
+  var newItems = [
+    { id:'gem',   priceMin:200, priceMax:450 },
+    { id:'hide',  priceMin:80,  priceMax:280 },
+    { id:'arrow', priceMin:20,  priceMax:120 }
+  ];
+  newItems.forEach(function(cfg) {
+    var item = ITEMS.filter(function(i){ return i.id === cfg.id; })[0];
+    item.price      = Math.round(cfg.priceMin + Math.random() * (cfg.priceMax - cfg.priceMin));
+    item.volatility = Math.round((0.05 + Math.random() * 0.075) * 1.25 * 10000) / 10000;
+    item.trend      = (Math.random() - 0.5) * 0.0012;
+  });
+}());
+
+var MAX_HISTORY       = 60;
+var TICK_MS           = 2000;
+var CANDLE_TICKS      = 3;
+var MA_PERIOD         = 20;
+var STARTING_GP       = 1000;
+var MARGIN_RATE       = 0.2;
+var TREND_SHIFT_TICKS = 500;
+var WARNING_TICKS     = 50;
 
 var wallet        = STARTING_GP;
 var positions     = [];
@@ -473,14 +573,14 @@ var modalItemId   = null;
 var modalLev      = 1;
 var pendingTrade  = null;
 var tickCount     = 0;
-var chartMode     = 'candle'; // 'candle' | 'line'
+var chartMode     = 'candle';
+var nextShiftAt   = TREND_SHIFT_TICKS;
+var newsTimer     = null;
+var strobeTimers  = {};
 
 ITEMS.forEach(function(item) {
   lastPrices[item.id] = item.price;
-  item.candles = []; // { o, h, l, c }
-  item.candleTickBuf = []; // raw ticks for current forming candle
   for (var i = 0; i < 20; i++) item.history.push(item.price);
-  // seed 15 initial candles
   for (var j = 0; j < 15; j++) {
     item.candles.push({ o: item.price, h: item.price, l: item.price, c: item.price });
   }
@@ -573,7 +673,95 @@ function checkSLTP() {
   });
 }
 
-// ── UTILS ─────────────────────────────────────────────────────────────────────
+// ── TREND SHIFT ───────────────────────────────────────────────────────────────
+function randomTrend() {
+  return (Math.random() - 0.5) * 0.0012; // -0.0006 to +0.0006
+}
+
+function shiftTrends() {
+  ITEMS.forEach(function(item) { item.trend = randomTrend(); });
+  nextShiftAt = tickCount + TREND_SHIFT_TICKS;
+  dismissNews();
+  showToast('New trading session started! Trends have shifted.', 'tp-hit');
+}
+
+function showBreakingNews(ticksLeft) {
+  document.getElementById('bn-headline').textContent = 'New trading session coming soon!';
+  document.getElementById('bn-sub').textContent = 'Market trend biases will reset across all assets';
+  document.getElementById('bn-countdown').textContent = ticksLeft + ' ticks remaining';
+  document.getElementById('breaking-news').classList.add('show');
+  // Do NOT auto-dismiss — keep it until the session actually shifts
+}
+
+function updateNewsCountdown(ticksLeft) {
+  var el = document.getElementById('bn-countdown');
+  if (el) el.textContent = ticksLeft + ' ticks remaining';
+}
+
+function dismissNews() {
+  document.getElementById('breaking-news').classList.remove('show');
+  clearTimeout(newsTimer);
+}
+
+// ── STROBE ────────────────────────────────────────────────────────────────────
+function strobeChart(itemId, direction) {
+  var wrap = document.querySelector('#card-' + itemId + ' .chart-wrap');
+  if (!wrap) return;
+  var ov = wrap.querySelector('.strobe-overlay');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.className = 'strobe-overlay';
+    wrap.appendChild(ov);
+  }
+  var cls = direction === 'up' ? 'flash-green' : 'flash-red';
+  ov.className = 'strobe-overlay ' + cls;
+  ov.style.opacity = '1';
+  clearTimeout(strobeTimers[itemId]);
+  strobeTimers[itemId] = setTimeout(function() { ov.style.opacity = '0'; }, 300);
+
+  // Also pulse the card glow
+  var card = document.getElementById('card-' + itemId);
+  if (card) {
+    card.classList.add('strobe-active');
+    setTimeout(function() { card.classList.remove('strobe-active'); }, 600);
+  }
+}
+
+// ── CLOSE ALL ─────────────────────────────────────────────────────────────────
+function closeAllPositions() {
+  var count = positions.length;
+  if (count === 0) { showToast('No open positions to close', 'error'); return; }
+  var totalPnl = 0;
+  var toClose = positions.slice();
+  toClose.forEach(function(pos) {
+    var item = getItem(pos.itemId);
+    var pnl  = calcPnl(pos, item.price);
+    totalPnl += pnl;
+    recordTrade(pos, item.price, pnl, 'manual');
+    wallet += Math.max(0, pos.margin + pnl);
+  });
+  positions = [];
+  showToast('Closed ' + count + ' position' + (count > 1 ? 's' : '') + ' | ' + fmtPnl(Math.round(totalPnl)) + ' gp total', totalPnl >= 0 ? 'buy' : 'sell');
+  renderAll();
+}
+
+function closeItemPositions(itemId) {
+  var item = getItem(itemId);
+  var toClose = positions.filter(function(p){ return p.itemId === itemId; });
+  if (toClose.length === 0) return;
+  var totalPnl = 0;
+  toClose.forEach(function(pos) {
+    var pnl = calcPnl(pos, item.price);
+    totalPnl += pnl;
+    recordTrade(pos, item.price, pnl, 'manual');
+    wallet += Math.max(0, pos.margin + pnl);
+  });
+  positions = positions.filter(function(p){ return p.itemId !== itemId; });
+  showToast('Closed ' + item.name + ' positions | ' + fmtPnl(Math.round(totalPnl)) + ' gp', totalPnl >= 0 ? 'buy' : 'sell');
+  renderAll();
+}
+
+
 function getItem(id) { return ITEMS.filter(function(i){ return i.id === id; })[0]; }
 function fmt(n)      { return Math.round(n).toLocaleString(); }
 function fmtPnl(v)   { return (v >= 0 ? '+' : '') + fmt(v); }
@@ -932,7 +1120,17 @@ function showToast(msg, type) {
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
 function renderAll() {
-  renderWallet(); renderMarket(); renderPortfolio(); renderCharts(); renderHistory();
+  renderWallet(); renderMarket(); renderPortfolio(); renderHistory(); renderCloseAll();
+}
+
+function renderCloseAll() {
+  var wrap = document.getElementById('market-close-all-wrap');
+  if (!wrap) return;
+  if (positions.length > 0) {
+    wrap.innerHTML = '<button class="btn-close-all" onclick="closeAllPositions()">✕ Close All ' + positions.length + ' Position' + (positions.length > 1 ? 's' : '') + ' — Market Price</button>';
+  } else {
+    wrap.innerHTML = '';
+  }
 }
 
 function renderWallet() {
@@ -965,9 +1163,12 @@ function renderMarket() {
       h +=     '<div class="item-change" id="change-' + item.id + '"></div>';
       h +=   '</div>';
       h += '</div>';
-      h += '<div class="chart-wrap"><canvas class="price-chart" id="mchart-' + item.id + '"></canvas></div>';
+      h += '<div class="chart-wrap"><canvas class="price-chart" id="mchart-' + item.id + '"></canvas><div class="chart-ohlc-bar" id="ohlc-' + item.id + '"></div></div>';
       h += '<div id="posbar-' + item.id + '"></div>';
-      h += '<button class="btn-trade" onclick="openModal(\'' + item.id + '\')">Open Trade — Long or Short</button>';
+      h += '<div class="market-close-row">';
+      h +=   '<button class="btn-trade" style="margin:0;flex:2" onclick="openModal(\'' + item.id + '\')">Open Trade</button>';
+      h +=   '<button class="btn-close-item" id="closeitem-' + item.id + '" onclick="closeItemPositions(\'' + item.id + '\')">Close All</button>';
+      h += '</div>';
       card.innerHTML = h;
       container.appendChild(card);
     }
@@ -1011,7 +1212,31 @@ function renderMarket() {
     }
 
     var canvas = document.getElementById('mchart-' + item.id);
-    if (canvas && canvas.offsetWidth > 0) drawChart(canvas, item, true);
+    if (canvas && canvas.offsetWidth > 0) drawChart(canvas, item, false);
+
+    // Update OHLC bar
+    var ohlcBar = document.getElementById('ohlc-' + item.id);
+    if (ohlcBar && item.candles.length) {
+      var lc = item.candles[item.candles.length - 1];
+      var cDir = lc.c >= lc.o ? 'var(--green)' : 'var(--red)';
+      ohlcBar.innerHTML =
+        'O:<span>' + fmt(lc.o) + '</span> ' +
+        'H:<span style="color:#5deb8f">' + fmt(lc.h) + '</span> ' +
+        'L:<span style="color:#ff6b6b">' + fmt(lc.l) + '</span> ' +
+        'C:<span style="color:' + cDir + '">' + fmt(lc.c) + '</span>' +
+        ' &nbsp; MA20:<span style="color:#f0c040" id="ma-' + item.id + '">--</span>';
+      // Compute live MA20 for display
+      var maVal = computeMA(item.candles, MA_PERIOD);
+      var maEl = document.getElementById('ma-' + item.id);
+      if (maEl) maEl.textContent = maVal !== null ? fmt(maVal) : '--';
+    }
+
+    // Update close-item button state
+    var closeItemBtn = document.getElementById('closeitem-' + item.id);
+    if (closeItemBtn) {
+      var hasPos = positions.filter(function(p){ return p.itemId === item.id; }).length > 0;
+      closeItemBtn.disabled = !hasPos;
+    }
   });
 }
 
@@ -1079,96 +1304,24 @@ function renderPortfolio() {
   list.innerHTML = html;
 }
 
-function renderCharts() {
-  var container = document.getElementById('charts-list');
-
-  // Chart mode toggle row (once)
-  var toggleRow = document.getElementById('chart-toggle-row');
-  if (!toggleRow) {
-    toggleRow = document.createElement('div');
-    toggleRow.id = 'chart-toggle-row';
-    toggleRow.className = 'chart-toggle-row';
-    toggleRow.innerHTML =
-      '<span class="chart-toggle-label">Chart Type</span>' +
-      '<div class="chart-toggle-btns">' +
-        '<button class="chart-tog-btn active" id="tog-candle" onclick="setChartMode(\'candle\')">🕯 Candlestick</button>' +
-        '<button class="chart-tog-btn" id="tog-line" onclick="setChartMode(\'line\')">📈 Line</button>' +
-      '</div>' +
-      '<span class="ma-legend"><span class="ma-dot"></span>MA20</span>';
-    container.parentNode.insertBefore(toggleRow, container);
-  }
-
-  ITEMS.forEach(function(item) {
-    var minH      = Math.min.apply(null, item.history);
-    var maxH      = Math.max.apply(null, item.history);
-    var startH    = item.history[0] || item.price;
-    var totalChg  = item.price - startH;
-    var totalPct  = pct(item.price, startH);
-    var sessColor = totalChg >= 0 ? 'var(--green)' : 'var(--red)';
-    var sessStr   = (totalChg >= 0 ? '+' : '') + totalPct.toFixed(1) + '%';
-
-    // Current candle info
-    var lastCandle = item.candles.length ? item.candles[item.candles.length - 1] : null;
-    var candleDir  = lastCandle ? (lastCandle.c >= lastCandle.o ? 'var(--green)' : 'var(--red)') : 'var(--text)';
-
-    var card = document.getElementById('fchart-' + item.id);
-    if (!card) {
-      card = document.createElement('div');
-      card.className = 'chart-full-card';
-      card.id = 'fchart-' + item.id;
-      var h = '';
-      h += '<div class="chart-full-header">';
-      h +=   '<span class="chart-full-icon">' + item.icon + '</span>';
-      h +=   '<span class="chart-full-name">' + item.name + '</span>';
-      h +=   '<div style="text-align:right">';
-      h +=     '<div class="chart-full-price" id="fcprice-' + item.id + '">' + fmt(item.price) + ' gp</div>';
-      if (lastCandle) {
-        h +=   '<div class="chart-ohlc" id="fcohlc-' + item.id + '">';
-        h +=     'O:<span>' + fmt(lastCandle.o) + '</span> ';
-        h +=     'H:<span style="color:var(--green)">' + fmt(lastCandle.h) + '</span> ';
-        h +=     'L:<span style="color:var(--red)">'   + fmt(lastCandle.l) + '</span> ';
-        h +=     'C:<span style="color:' + candleDir + '">' + fmt(lastCandle.c) + '</span>';
-        h +=   '</div>';
-      }
-      h +=   '</div>';
-      h += '</div>';
-      h += '<canvas class="chart-full-canvas" id="fcanvas-' + item.id + '"></canvas>';
-      h += '<div class="chart-stats">';
-      h +=   '<div class="chart-stat"><div class="chart-stat-label">Session Low</div><div class="chart-stat-val" id="fclow-' + item.id + '">' + fmt(minH) + '</div></div>';
-      h +=   '<div class="chart-stat"><div class="chart-stat-label">Session High</div><div class="chart-stat-val" id="fchigh-' + item.id + '">' + fmt(maxH) + '</div></div>';
-      h +=   '<div class="chart-stat"><div class="chart-stat-label">Candles</div><div class="chart-stat-val" id="fccandles-' + item.id + '">' + item.candles.length + '</div></div>';
-      h +=   '<div class="chart-stat"><div class="chart-stat-label">Session Chg</div><div class="chart-stat-val" id="fcsession-' + item.id + '" style="color:' + sessColor + '">' + sessStr + '</div></div>';
-      h += '</div>';
-      card.innerHTML = h;
-      container.appendChild(card);
-    } else {
-      document.getElementById('fcprice-'   + item.id).textContent = fmt(item.price) + ' gp';
-      document.getElementById('fclow-'     + item.id).textContent = fmt(minH);
-      document.getElementById('fchigh-'    + item.id).textContent = fmt(maxH);
-      document.getElementById('fccandles-' + item.id).textContent = item.candles.length;
-      var sess = document.getElementById('fcsession-' + item.id);
-      sess.textContent = sessStr;
-      sess.style.color = sessColor;
-      // Update OHLC
-      var ohlcEl = document.getElementById('fcohlc-' + item.id);
-      if (ohlcEl && lastCandle) {
-        ohlcEl.innerHTML =
-          'O:<span>' + fmt(lastCandle.o) + '</span> ' +
-          'H:<span style="color:var(--green)">' + fmt(lastCandle.h) + '</span> ' +
-          'L:<span style="color:var(--red)">'   + fmt(lastCandle.l) + '</span> ' +
-          'C:<span style="color:' + candleDir + '">' + fmt(lastCandle.c) + '</span>';
-      }
-    }
-    var canvas = document.getElementById('fcanvas-' + item.id);
-    if (canvas && canvas.offsetWidth > 0) drawChart(canvas, item, false);
-  });
+function computeMA(candles, period) {
+  if (candles.length < period) return null;
+  var sum = 0;
+  for (var i = candles.length - period; i < candles.length; i++) sum += candles[i].c;
+  return sum / period;
 }
 
 function setChartMode(mode) {
   chartMode = mode;
-  document.getElementById('tog-candle').className = 'chart-tog-btn' + (mode === 'candle' ? ' active' : '');
-  document.getElementById('tog-line').className   = 'chart-tog-btn' + (mode === 'line'   ? ' active' : '');
-  renderCharts();
+  var cBtn = document.getElementById('tog-candle');
+  var lBtn = document.getElementById('tog-line');
+  if (cBtn) cBtn.className = 'chart-tog-btn' + (mode === 'candle' ? ' active' : '');
+  if (lBtn) lBtn.className = 'chart-tog-btn' + (mode === 'line'   ? ' active' : '');
+  // Redraw all market canvases
+  ITEMS.forEach(function(item) {
+    var canvas = document.getElementById('mchart-' + item.id);
+    if (canvas && canvas.offsetWidth > 0) drawChart(canvas, item, false);
+  });
 }
 
 function renderHistory() {
@@ -1291,9 +1444,8 @@ function showPage(name) {
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
   document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
   document.getElementById('page-' + name).classList.add('active');
-  var pages = ['market','portfolio','charts','history'];
+  var pages = ['market','portfolio','history'];
   document.querySelectorAll('.tab')[pages.indexOf(name)].classList.add('active');
-  if (name === 'charts') setTimeout(renderCharts, 50);
   if (name === 'history') renderHistory();
 }
 
@@ -1304,13 +1456,31 @@ function tick() {
   dot.style.background = '#f0c040';
   document.getElementById('tick-label').textContent = 'Tick #' + tickCount;
   setTimeout(function(){ dot.style.background = 'var(--green)'; }, 300);
+
+  // Trend shift
+  var ticksToShift = nextShiftAt - tickCount;
+  if (ticksToShift === WARNING_TICKS) {
+    showBreakingNews(ticksToShift);
+  } else if (ticksToShift < WARNING_TICKS && ticksToShift > 0) {
+    updateNewsCountdown(ticksToShift);
+  } else if (tickCount >= nextShiftAt) {
+    shiftTrends();
+  }
+
   updatePrices();
+
+  // Strobe charts on every tick
+  ITEMS.forEach(function(item) {
+    var prev = lastPrices[item.id] || item.price;
+    var dir  = item.price >= prev ? 'up' : 'down';
+    strobeChart(item.id, dir);
+  });
 }
 
 window.addEventListener('load', function() {
   renderAll();
   setInterval(tick, TICK_MS);
-  window.addEventListener('resize', function(){ renderCharts(); renderMarket(); });
+  window.addEventListener('resize', function(){ renderMarket(); });
 });
 </script>
 </body>
