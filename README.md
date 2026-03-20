@@ -1376,6 +1376,8 @@ function openModal(itemId) {
   document.getElementById('modal-sl').value  = '';
   document.getElementById('modal-tp').value  = '';
   document.getElementById('modal-lot').value = '1';
+  // Reset modalLev to 1 first so setLev(1) computes ratio 1/1 = no change
+  modalLev = 1;
   setLev(1);
 
   // Position modal near the asset card
@@ -1405,10 +1407,18 @@ document.getElementById('modal-overlay').addEventListener('click', function(e) {
 });
 
 function setLev(v) {
+  var prevLev = modalLev;
   modalLev = v;
   document.querySelectorAll('.modal-lev-btn').forEach(function(b) {
     b.classList.toggle('active', +b.getAttribute('data-lev') === v);
   });
+  // Auto-scale lots by leverage ratio
+  var lotEl = document.getElementById('modal-lot');
+  if (lotEl && prevLev > 0) {
+    var currentLots = parseInt(lotEl.value) || 1;
+    var newLots = Math.round(currentLots * (v / prevLev));
+    lotEl.value = Math.max(1, Math.min(100, newLots));
+  }
   updateModalCost();
 }
 
