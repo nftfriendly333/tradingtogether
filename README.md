@@ -239,7 +239,7 @@
 
   /* BREAKING NEWS BANNER */
   .breaking-news{position:fixed;top:0;left:0;right:0;z-index:600;transform:translateY(-100%);
-    transition:transform .5s cubic-bezier(.34,1.2,.64,1)}
+    transition:transform .4s cubic-bezier(.34,1.2,.64,1)}
   .breaking-news.show{transform:translateY(0)}
   .bn-bar{background:linear-gradient(135deg,#8b0000,#c0392b,#8b0000);
     border-bottom:3px solid #ff4444;padding:0;overflow:hidden;position:relative}
@@ -247,19 +247,23 @@
     background:repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(255,255,255,.04) 40px,rgba(255,255,255,.04) 41px);
     pointer-events:none}
   .bn-inner{display:flex;align-items:stretch}
-  .bn-label{background:#ff0000;color:#fff;font-family:'Cinzel',serif;font-size:.75rem;font-weight:700;
-    letter-spacing:2px;padding:10px 14px;text-transform:uppercase;flex-shrink:0;
-    display:flex;align-items:center;gap:6px;animation:bnLabelPulse 1s ease-in-out infinite}
+  .bn-label{background:#ff0000;color:#fff;font-family:'Cinzel',serif;font-size:.72rem;font-weight:700;
+    letter-spacing:1px;padding:0 10px;text-transform:uppercase;flex-shrink:0;
+    display:flex;align-items:center;writing-mode:initial;
+    animation:bnLabelPulse 1s ease-in-out infinite;min-width:52px;justify-content:center}
   @keyframes bnLabelPulse{0%,100%{background:#ff0000}50%{background:#cc0000}}
-  .bn-content{flex:1;padding:8px 14px;overflow:hidden}
-  .bn-headline{font-family:'Cinzel',serif;font-size:.88rem;color:#fff;font-weight:700;
-    letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .bn-sub{font-size:.7rem;color:rgba(255,220,220,.8);margin-top:2px;font-style:italic}
-  .bn-close{background:rgba(0,0,0,.3);border:none;color:rgba(255,255,255,.7);font-size:1.2rem;
-    padding:0 14px;cursor:pointer;flex-shrink:0;transition:color .15s}
+  .bn-content{flex:1;padding:6px 10px;overflow:hidden;min-width:0}
+  .bn-headline{font-family:'Cinzel',serif;font-size:.82rem;color:#fff;font-weight:700;
+    letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+  .bn-meta{display:flex;align-items:center;gap:8px;margin-top:3px;flex-wrap:nowrap}
+  .bn-sub{font-size:.66rem;color:rgba(255,220,220,.8);font-style:italic;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+  .bn-countdown{font-family:'Cinzel',serif;font-size:.68rem;color:#fff;font-weight:700;
+    white-space:nowrap;flex-shrink:0;background:rgba(0,0,0,.25);
+    padding:2px 7px;border-radius:8px;letter-spacing:.5px}
+  .bn-close{background:rgba(0,0,0,.3);border:none;color:rgba(255,255,255,.7);font-size:1rem;
+    padding:0 10px;cursor:pointer;flex-shrink:0;transition:color .15s;min-width:32px}
   .bn-close:hover{color:#fff}
-  .bn-countdown{font-family:'Cinzel',serif;font-size:.65rem;color:rgba(255,200,200,.8);
-    padding:0 12px;display:flex;align-items:center;letter-spacing:1px;flex-shrink:0}
 
   /* CHART STROBE */
   .chart-wrap{position:relative}
@@ -385,14 +389,16 @@
 
 <!-- BREAKING NEWS BANNER -->
 <div class="breaking-news" id="breaking-news">
-  <div class="bn-bar">
+  <div class="bn-bar" id="bn-bar">
     <div class="bn-inner">
-      <div class="bn-label">📡 Breaking</div>
+      <div class="bn-label" id="bn-label">📡</div>
       <div class="bn-content">
         <div class="bn-headline" id="bn-headline">Market conditions shifting...</div>
-        <div class="bn-sub" id="bn-sub">Trend bias randomised across all assets</div>
+        <div class="bn-meta">
+          <div class="bn-sub" id="bn-sub">Trend bias randomised across all assets</div>
+          <div class="bn-countdown" id="bn-countdown"></div>
+        </div>
       </div>
-      <div class="bn-countdown" id="bn-countdown"></div>
       <button class="bn-close" onclick="dismissNews()">✕</button>
     </div>
   </div>
@@ -507,7 +513,7 @@
   </div>
 </div>
 
-<!-- WARNING POPUP -->
+<!-- WARNING POPUP — too much position size -->
 <div class="warning-overlay" id="warning-overlay">
   <div class="warning-box">
     <div class="warning-emoji">🤡</div>
@@ -517,6 +523,20 @@
     <div class="warning-btns">
       <button class="warning-btn-cancel" onclick="closeWarning()">Play it safe</button>
       <button class="warning-btn-confirm" onclick="confirmTrade()">Yolo it 🎲</button>
+    </div>
+  </div>
+</div>
+
+<!-- WARNING POPUP — max leverage on high volatility -->
+<div class="warning-overlay" id="lev-warning-overlay">
+  <div class="warning-box" style="border-color:#ff8c00;box-shadow:0 0 40px rgba(255,140,0,.4),0 8px 32px rgba(0,0,0,.8)">
+    <div class="warning-emoji">🔥</div>
+    <div class="warning-pct" style="color:#ff8c00" id="lev-warning-vol">Volatility: --%</div>
+    <div class="warning-title" style="color:#ff8c00;text-shadow:0 0 12px rgba(255,140,0,.4)">Max Leverage Warning</div>
+    <div class="warning-body">This is a <strong style="color:#ffcc88">high volatility pair</strong>. Using 10x leverage means a small price move can wipe your entire margin instantly. Liquidation is very likely.</div>
+    <div class="warning-btns">
+      <button class="warning-btn-cancel" onclick="closeLevWarning()">Lower leverage</button>
+      <button class="warning-btn-confirm" style="border-color:#ff8c00;background:linear-gradient(135deg,#5c3000,#3d1f00)" onclick="confirmLevTrade()">I understand the risk 🔥</button>
     </div>
   </div>
 </div>
@@ -575,12 +595,12 @@
 
 <script>
 var ITEMS = [
-  { id:'sword',  name:'Dragon Longsword',    desc:'A fearsome blade of dragonite',    icon:'⚔️', price:220, volatility:0.0625, trend:0.001,  history:[], candles:[], candleTickBuf:[] },
-  { id:'rune',   name:'Fire Rune Bundle',    desc:'Ancient runes pulsing with flame', icon:'🔥', price:85,  volatility:0.1000, trend:-0.001, history:[], candles:[], candleTickBuf:[] },
-  { id:'potion', name:'Super Restore Potion',desc:'Restores stats drained in battle', icon:'🧪', price:150, volatility:0.0500, trend:0.002,  history:[], candles:[], candleTickBuf:[] },
-  { id:'gem',    name:'Onyx Gem',            desc:'Rare gemstone from deep mines',    icon:'💎', price:310, volatility:0,       trend:0,      history:[], candles:[], candleTickBuf:[] },
-  { id:'hide',   name:'Dragon Leather Hide', desc:'Tanned hide of a slain dragon',   icon:'🐉', price:175, volatility:0,       trend:0,      history:[], candles:[], candleTickBuf:[] },
-  { id:'arrow',  name:'Rune Arrow Bundle',   desc:'Magically tipped arrows of rune', icon:'🏹', price:55,  volatility:0,       trend:0,      history:[], candles:[], candleTickBuf:[] }
+  { id:'sword',  name:'Dragon Longsword',    desc:'A fearsome blade of dragonite',    icon:'⚔️', price:220, basePrice:220, volatility:0.0594, trend:0.001,  history:[], candles:[], candleTickBuf:[] },
+  { id:'rune',   name:'Fire Rune Bundle',    desc:'Ancient runes pulsing with flame', icon:'🔥', price:85,  basePrice:85,  volatility:0.0950, trend:-0.001, history:[], candles:[], candleTickBuf:[] },
+  { id:'potion', name:'Super Restore Potion',desc:'Restores stats drained in battle', icon:'🧪', price:150, basePrice:150, volatility:0.0475, trend:0.002,  history:[], candles:[], candleTickBuf:[] },
+  { id:'gem',    name:'Onyx Gem',            desc:'Rare gemstone from deep mines',    icon:'💎', price:310, basePrice:310, volatility:0,       trend:0,      history:[], candles:[], candleTickBuf:[] },
+  { id:'hide',   name:'Dragon Leather Hide', desc:'Tanned hide of a slain dragon',   icon:'🐉', price:175, basePrice:175, volatility:0,       trend:0,      history:[], candles:[], candleTickBuf:[] },
+  { id:'arrow',  name:'Rune Arrow Bundle',   desc:'Magically tipped arrows of rune', icon:'🏹', price:55,  basePrice:55,  volatility:0,       trend:0,      history:[], candles:[], candleTickBuf:[] }
 ];
 
 // Randomize volatility, trend, and starting price for the 3 new items at startup
@@ -593,7 +613,8 @@ var ITEMS = [
   newItems.forEach(function(cfg) {
     var item = ITEMS.filter(function(i){ return i.id === cfg.id; })[0];
     item.price      = Math.round(cfg.priceMin + Math.random() * (cfg.priceMax - cfg.priceMin));
-    item.volatility = Math.round((0.05 + Math.random() * 0.075) * 1.25 * 10000) / 10000;
+    item.basePrice  = item.price;
+    item.volatility = Math.round((0.05 + Math.random() * 0.075) * 1.25 * 0.95 * 10000) / 10000;
     item.trend      = (Math.random() - 0.5) * 0.0012;
   });
 }());
@@ -606,6 +627,8 @@ var STARTING_GP       = 1000;
 var MARGIN_RATE       = 0.2;
 var TREND_SHIFT_TICKS = 150;
 var WARNING_TICKS     = 25;
+var PRICE_CEILING     = 7000;   // above this, asset is suspended and reset
+var CEILING_WARN_TICKS = 10;    // warn this many ticks before forced close
 
 var wallet        = STARTING_GP;
 var positions     = [];
@@ -621,6 +644,7 @@ var nextShiftAt   = TREND_SHIFT_TICKS;
 var newsTimer     = null;
 var strobeTimers  = {};
 var sessionBoundaries = []; // tick counts where sessions ended, used to draw vertical lines
+var ceilingWarnings   = {}; // { itemId: ticksUntilReset } — countdown per suspended asset
 
 ITEMS.forEach(function(item) {
   lastPrices[item.id] = item.price;
@@ -666,6 +690,7 @@ function updatePrices() {
     }
   });
   checkSLTP();
+  checkPriceCeiling();
   renderAll();
 }
 
@@ -720,7 +745,75 @@ function checkSLTP() {
   });
 }
 
-// ── TREND SHIFT ───────────────────────────────────────────────────────────────
+// ── PRICE CEILING CHECK ───────────────────────────────────────────────────────
+function checkPriceCeiling() {
+  ITEMS.forEach(function(item) {
+    // If already in countdown, tick it down
+    if (ceilingWarnings[item.id] !== undefined) {
+      ceilingWarnings[item.id]--;
+
+      // Update banner countdown
+      var el = document.getElementById('bn-countdown');
+      if (el && ceilingWarnings[item.id] >= 0) {
+        el.textContent = ceilingWarnings[item.id] + ' ticks';
+      }
+
+      if (ceilingWarnings[item.id] <= 0) {
+        // Force close all positions for this item
+        var toClose = positions.filter(function(p){ return p.itemId === item.id; });
+        var totalPnl = 0;
+        toClose.forEach(function(pos) {
+          var pnl = calcPnl(pos, item.price);
+          totalPnl += pnl;
+          recordTrade(pos, item.price, pnl, 'ceiling');
+          wallet += Math.max(0, pos.margin + pnl);
+        });
+        positions = positions.filter(function(p){ return p.itemId !== item.id; });
+
+        // Reset item to base price
+        item.price = item.basePrice;
+        item.trend = randomTrend();
+        item.history = [];
+        item.candles = [];
+        item.candleTickBuf = [];
+        lastPrices[item.id] = item.price;
+        for (var i = 0; i < 20; i++) item.history.push(item.price);
+        for (var j = 0; j < 15; j++) {
+          item.candles.push({ o: item.price, h: item.price, l: item.price, c: item.price });
+        }
+
+        delete ceilingWarnings[item.id];
+        dismissNews();
+        resetBannerStyle();
+
+        // Remove this item's card so it rebuilds fresh
+        var oldCard = document.getElementById('card-' + item.id);
+        if (oldCard) oldCard.parentNode.removeChild(oldCard);
+
+        showToast(item.icon + ' ' + item.name + ' suspended & reset to ' + fmt(item.basePrice) + ' gp' + (toClose.length ? ' | Positions closed: ' + fmtPnl(Math.round(totalPnl)) + ' gp' : ''), 'error');
+        scheduleSave();
+      }
+      return;
+    }
+
+    // Check if price just crossed the ceiling
+    if (item.price >= PRICE_CEILING) {
+      ceilingWarnings[item.id] = CEILING_WARN_TICKS;
+
+      // Show breaking news banner
+      var bar   = document.getElementById('bn-bar');
+      var label = document.getElementById('bn-label');
+      if (bar)   { bar.style.background = 'linear-gradient(135deg,#4a2a00,#7a4a00,#4a2a00)'; bar.style.borderBottomColor = '#ff8c00'; }
+      if (label) { label.style.background = '#8a4a00'; label.textContent = '⚠️ Suspended'; }
+      document.getElementById('bn-headline').textContent = item.icon + '  ' + item.name + ' hit price ceiling of 7,000 gp!';
+      document.getElementById('bn-sub').textContent      = 'All positions will be closed automatically — asset resetting to base price';
+      document.getElementById('bn-countdown').textContent = CEILING_WARN_TICKS + ' ticks';
+      document.getElementById('breaking-news').classList.add('show');
+      clearTimeout(newsTimer);
+    }
+  });
+}
+
 function randomTrend() {
   return (Math.random() - 0.5) * 0.0012; // -0.0006 to +0.0006
 }
@@ -738,14 +831,14 @@ function shiftTrends() {
 function showBreakingNews(ticksLeft) {
   resetBannerStyle();
   document.getElementById('bn-headline').textContent = 'New trading session coming soon!';
-  document.getElementById('bn-sub').textContent = '150-tick session ending — trend biases will reset across all assets';
-  document.getElementById('bn-countdown').textContent = ticksLeft + ' ticks remaining';
+  document.getElementById('bn-sub').textContent = '150-tick session ending — trends will reset';
+  document.getElementById('bn-countdown').textContent = ticksLeft + ' ticks';
   document.getElementById('breaking-news').classList.add('show');
 }
 
 function updateNewsCountdown(ticksLeft) {
   var el = document.getElementById('bn-countdown');
-  if (el) el.textContent = ticksLeft + ' ticks remaining';
+  if (el) el.textContent = ticksLeft + ' ticks';
 }
 
 function dismissNews() {
@@ -794,15 +887,15 @@ function showEventBanner(type, item, ticks, eventPct) {
   var label  = document.getElementById('bn-label');
 
   if (type === 'surge') {
-    document.getElementById('bn-headline').textContent = item.icon + '  ' + item.name + ' SURGING  +' + pctStr + '!';
-    document.getElementById('bn-sub').textContent      = 'Strong upward move across ~' + ticks + ' ticks (' + secStr + ')  —  act fast!';
+    document.getElementById('bn-headline').textContent = item.icon + ' ' + item.name + ' SURGING +' + pctStr;
+    document.getElementById('bn-sub').textContent      = '~' + ticks + ' ticks (' + secStr + ') — act fast!';
     if (bar)   { bar.style.background = 'linear-gradient(135deg,#0a4a1a,#1a7a32,#0a4a1a)'; bar.style.borderBottomColor = '#2ecc71'; }
-    if (label) { label.style.background = '#1a8a30'; label.textContent = '📈 Surge'; }
+    if (label) { label.style.background = '#1a8a30'; label.textContent = '📈'; }
   } else {
-    document.getElementById('bn-headline').textContent = item.icon + '  ' + item.name + ' CRASHING  -' + pctStr + '!';
-    document.getElementById('bn-sub').textContent      = 'Strong downward move across ~' + ticks + ' ticks (' + secStr + ')  —  watch out!';
+    document.getElementById('bn-headline').textContent = item.icon + ' ' + item.name + ' CRASHING -' + pctStr;
+    document.getElementById('bn-sub').textContent      = '~' + ticks + ' ticks (' + secStr + ') — watch out!';
     if (bar)   { bar.style.background = 'linear-gradient(135deg,#4a0a0a,#7a1a1a,#4a0a0a)'; bar.style.borderBottomColor = '#e74c3c'; }
-    if (label) { label.style.background = '#8a1a1a'; label.textContent = '📉 Crash'; }
+    if (label) { label.style.background = '#8a1a1a'; label.textContent = '📉'; }
   }
 
   document.getElementById('bn-countdown').textContent = ticks + ' ticks';
@@ -820,7 +913,7 @@ function resetBannerStyle() {
   var bar   = document.getElementById('bn-bar');
   var label = document.getElementById('bn-label');
   if (bar)   { bar.style.background = ''; bar.style.borderBottomColor = ''; }
-  if (label) { label.style.background = ''; label.textContent = '📡 Breaking'; }
+  if (label) { label.style.background = ''; label.textContent = '📡'; }
 }
 
 function applyEventPrices() {
@@ -1394,6 +1487,13 @@ function openTrade(dir) {
 
   pendingTrade = { dir: dir, item: item, margin: margin, lots: lots, sl: sl, tp: tp };
 
+  // Max leverage warning on high volatility pairs (volatility >= 0.08, leverage = 10)
+  if (modalLev === 10 && item.volatility >= 0.08) {
+    document.getElementById('lev-warning-vol').textContent = 'Volatility: ' + (item.volatility * 100).toFixed(1) + '% per tick';
+    document.getElementById('lev-warning-overlay').classList.add('open');
+    return;
+  }
+
   if (pctOfPort >= 50) {
     document.getElementById('warning-pct').textContent = pctOfPort.toFixed(1) + '% of your portfolio';
     document.getElementById('warning-overlay').classList.add('open');
@@ -1427,6 +1527,25 @@ function confirmTrade() {
 
 function closeWarning() {
   document.getElementById('warning-overlay').classList.remove('open');
+}
+
+function closeLevWarning() {
+  document.getElementById('lev-warning-overlay').classList.remove('open');
+  pendingTrade = null;
+}
+
+function confirmLevTrade() {
+  document.getElementById('lev-warning-overlay').classList.remove('open');
+  if (!pendingTrade) return;
+  // Now check position size warning
+  var wealth    = getTotalWealth();
+  var pctOfPort = wealth > 0 ? (pendingTrade.margin / wealth * 100) : 0;
+  if (pctOfPort >= 50) {
+    document.getElementById('warning-pct').textContent = pctOfPort.toFixed(1) + '% of your portfolio';
+    document.getElementById('warning-overlay').classList.add('open');
+    return;
+  }
+  executeTrade(pendingTrade);
 }
 
 function closePosition(posId) {
@@ -1734,8 +1853,8 @@ function renderHistory() {
     return;
   }
 
-  var closeLabels  = { manual:'Manual', sl:'Stop Loss', tp:'Take Profit', liq:'Liquidated' };
-  var closeClasses = { manual:'manual', sl:'sl', tp:'tp', liq:'liq' };
+  var closeLabels  = { manual:'Manual', sl:'Stop Loss', tp:'Take Profit', liq:'Liquidated', ceiling:'Suspended' };
+  var closeClasses = { manual:'manual', sl:'sl', tp:'tp', liq:'liq', ceiling:'liq' };
 
   var rows = '';
   filtered.forEach(function(t) {
