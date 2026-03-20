@@ -588,7 +588,7 @@
       <button class="lot-btn" onclick="adjustLot(1)">+</button>
       <span class="lot-label">lots</span>
     </div>
-    <div class="modal-section-label">Risk Management <span style="color:#ff9999;font-size:.65rem">(Stop Loss required)</span></div>
+    <div class="modal-section-label">Risk Management <span style="color:#ff9999;font-size:.65rem">(Stop Loss required · % of margin)</span></div>
     <div class="modal-sltp-row">
       <div class="modal-field">
         <label class="sl" for="modal-sl">🛑 Stop Loss %</label>
@@ -1508,16 +1508,20 @@ function setTpPct(pct) {
   updateModalCost();
 }
 
-function pctToPrice(entryPrice, pct, dir, side) {
-  // side: 'sl' or 'tp', dir: 'long' or 'short'
+function pctToPrice(entryPrice, pct, dir, side, margin, leverage, lots) {
+  // pct is % of margin (e.g. 25 = lose/gain 25% of margin)
+  // units = how many "shares" the position controls
+  var units = (margin / entryPrice) * leverage;
+  var gpMove = (margin * pct / 100) / units; // price move needed to hit that margin %
+
   if (side === 'sl') {
     return dir === 'long'
-      ? entryPrice * (1 - pct / 100)
-      : entryPrice * (1 + pct / 100);
+      ? entryPrice - gpMove
+      : entryPrice + gpMove;
   } else {
     return dir === 'long'
-      ? entryPrice * (1 + pct / 100)
-      : entryPrice * (1 - pct / 100);
+      ? entryPrice + gpMove
+      : entryPrice - gpMove;
   }
 }
 
@@ -1553,8 +1557,8 @@ function updateModalCost() {
 
   if (slHint) {
     if (!isNaN(slVal) && slVal > 0) {
-      var slLong  = Math.round(pctToPrice(item.price, slVal, 'long',  'sl'));
-      var slShort = Math.round(pctToPrice(item.price, slVal, 'short', 'sl'));
+      var slLong  = Math.round(pctToPrice(item.price, slVal, 'long',  'sl', margin, modalLev, lots));
+      var slShort = Math.round(pctToPrice(item.price, slVal, 'short', 'sl', margin, modalLev, lots));
       slHint.textContent = '▲ ' + fmt(slLong) + ' gp  |  ▼ ' + fmt(slShort) + ' gp';
     } else {
       slHint.textContent = '';
@@ -1563,8 +1567,8 @@ function updateModalCost() {
 
   if (tpHint) {
     if (!isNaN(tpVal) && tpVal > 0) {
-      var tpLong  = Math.round(pctToPrice(item.price, tpVal, 'long',  'tp'));
-      var tpShort = Math.round(pctToPrice(item.price, tpVal, 'short', 'tp'));
+      var tpLong  = Math.round(pctToPrice(item.price, tpVal, 'long',  'tp', margin, modalLev, lots));
+      var tpShort = Math.round(pctToPrice(item.price, tpVal, 'short', 'tp', margin, modalLev, lots));
       tpHint.textContent = '▲ ' + fmt(tpLong) + ' gp  |  ▼ ' + fmt(tpShort) + ' gp';
     } else {
       tpHint.textContent = '';
@@ -1594,10 +1598,10 @@ function openTrade(dir) {
   }
   if (slRaw >= 100) { showToast('Stop Loss cannot be 100% or more', 'error'); return; }
 
-  // Convert % to actual gp prices
-  var sl = Math.round(pctToPrice(item.price, slRaw, dir, 'sl') * 100) / 100;
+  // Convert % of margin to actual gp prices
+  var sl = Math.round(pctToPrice(item.price, slRaw, dir, 'sl', margin, modalLev, lots) * 100) / 100;
   var tp = (!isNaN(tpRaw) && tpRaw > 0)
-    ? Math.round(pctToPrice(item.price, tpRaw, dir, 'tp') * 100) / 100
+    ? Math.round(pctToPrice(item.price, tpRaw, dir, 'tp', margin, modalLev, lots) * 100) / 100
     : null;
 
   // Sanity checks (shouldn't fail with pctToPrice but belt-and-braces)
