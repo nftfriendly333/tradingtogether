@@ -30,7 +30,7 @@
 
   /* TABS */
   .tabs{display:flex;background:var(--brown-dark);border-bottom:2px solid var(--gold-dark)}
-  .tab{flex:1;padding:9px 2px;text-align:center;font-family:'Cinzel',serif;font-size:.62rem;letter-spacing:.5px;
+  .tab{flex:1;padding:9px 2px;text-align:center;font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.5px;
     color:var(--text-dim);cursor:pointer;border-right:1px solid var(--border);transition:all .2s;
     text-transform:uppercase;user-select:none}
   .tab:last-child{border-right:none}
@@ -40,8 +40,8 @@
 
   .main{padding:10px 12px;max-width:480px;margin:0 auto}
   .market-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-  .section-title{font-family:'Cinzel',serif;font-size:.82rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase}
-  .tick-indicator{display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--text-dim)}
+  .section-title{font-family:'Cinzel',serif;font-size:.92rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase}
+  .tick-indicator{display:flex;align-items:center;gap:5px;font-size:.76rem;color:var(--text-dim)}
   .tick-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s ease-in-out infinite}
   @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
 
@@ -55,13 +55,13 @@
   .item-icon{width:40px;height:40px;background:linear-gradient(135deg,#4a2e10,#2a1808);border:2px solid var(--gold-dark);
     border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.35rem;flex-shrink:0}
   .item-info{flex:1;min-width:0}
-  .item-name{font-family:'Cinzel',serif;font-size:.83rem;font-weight:600;color:var(--gold-light);
+  .item-name{font-family:'Cinzel',serif;font-size:.92rem;font-weight:600;color:var(--gold-light);
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .item-desc{font-size:.7rem;color:var(--text-dim);font-style:italic;margin-top:1px}
+  .item-desc{font-size:.78rem;color:var(--text-dim);font-style:italic;margin-top:1px}
   .item-price-block{text-align:right;flex-shrink:0}
-  .item-price{font-family:'Cinzel',serif;font-size:1.05rem;font-weight:700;color:var(--gold);line-height:1;transition:color .3s}
+  .item-price{font-family:'Cinzel',serif;font-size:1.15rem;font-weight:700;color:var(--gold);line-height:1;transition:color .3s}
   .item-price.up{color:#5deb8f}.item-price.down{color:#ff6b6b}
-  .item-change{font-size:.68rem;margin-top:2px;font-weight:600}
+  .item-change{font-size:.76rem;margin-top:2px;font-weight:600}
   .item-change.pos{color:var(--green)}.item-change.neg{color:var(--red)}
   .chart-wrap{padding:6px 12px 5px;border-bottom:1px solid rgba(107,74,34,.4);position:relative}
   canvas.price-chart{width:100%;height:180px;display:block;border-radius:4px}
@@ -71,15 +71,15 @@
 
   .open-pos-bar{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:5px 12px;
     border-bottom:1px solid rgba(107,74,34,.3);background:rgba(0,0,0,.15)}
-  .pos-badge{font-family:'Cinzel',serif;font-size:.66rem;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.5px}
+  .pos-badge{font-family:'Cinzel',serif;font-size:.74rem;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.5px}
   .pos-badge.long{background:rgba(39,174,96,.2);border:1px solid rgba(39,174,96,.5);color:#7fffc4}
   .pos-badge.short{background:rgba(192,57,43,.2);border:1px solid rgba(192,57,43,.5);color:#ffb3b3}
-  .pos-pnl{font-family:'Cinzel',serif;font-size:.7rem;font-weight:700;margin-left:auto}
+  .pos-pnl{font-family:'Cinzel',serif;font-size:.78rem;font-weight:700;margin-left:auto}
   .pos-pnl.pos{color:var(--green)}.pos-pnl.neg{color:var(--red)}
 
   .btn-trade{display:block;width:calc(100% - 24px);margin:8px 12px;
     background:linear-gradient(135deg,#3a2408,#251505);border:1.5px solid var(--gold-dark);
-    border-radius:7px;padding:9px;font-family:'Cinzel',serif;font-size:.75rem;font-weight:600;
+    border-radius:7px;padding:9px;font-family:'Cinzel',serif;font-size:.82rem;font-weight:600;
     color:var(--gold);cursor:pointer;transition:all .15s;text-align:center;letter-spacing:1px;text-transform:uppercase}
   .btn-trade:hover{background:linear-gradient(135deg,#4a2e10,#2d1a08);box-shadow:0 0 10px rgba(240,192,64,.15)}
   .btn-trade:active{transform:scale(.97)}
@@ -89,15 +89,15 @@
     border-radius:10px;padding:14px;margin-bottom:12px;text-align:center;position:relative;overflow:hidden}
   .portfolio-summary::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
     background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-  .portfolio-total-label{font-size:.68rem;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+  .portfolio-total-label{font-size:.76rem;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
   .portfolio-total{font-family:'Cinzel',serif;font-size:1.8rem;font-weight:700;color:var(--gold);
     text-shadow:0 0 20px rgba(240,192,64,.3);line-height:1}
-  .portfolio-pl{font-size:.82rem;margin-top:5px;font-weight:600}
+  .portfolio-pl{font-size:.9rem;margin-top:5px;font-weight:600}
   .portfolio-pl.pos{color:var(--green)}.portfolio-pl.neg{color:var(--red)}
   .portfolio-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
   .portfolio-stat{background:rgba(0,0,0,.2);border-radius:6px;padding:7px;text-align:center}
-  .portfolio-stat-label{font-size:.62rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px}
-  .portfolio-stat-value{font-family:'Cinzel',serif;font-size:.88rem;color:var(--gold-light);font-weight:600;margin-top:2px}
+  .portfolio-stat-label{font-size:.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px}
+  .portfolio-stat-value{font-family:'Cinzel',serif;font-size:.95rem;color:var(--gold-light);font-weight:600;margin-top:2px}
 
   /* POSITION CARDS */
   .position-card{background:linear-gradient(135deg,var(--panel-light),var(--panel));border:1.5px solid var(--border);
@@ -106,21 +106,21 @@
   .position-card.short-card{border-left:3px solid var(--red)}
   .pos-card-top{display:flex;align-items:center;gap:8px;margin-bottom:7px}
   .pos-icon{font-size:1.3rem;flex-shrink:0}
-  .pos-card-name{font-family:'Cinzel',serif;font-size:.78rem;color:var(--gold-light);font-weight:600;flex:1}
-  .pos-card-pnl{font-family:'Cinzel',serif;font-size:.9rem;font-weight:700}
+  .pos-card-name{font-family:'Cinzel',serif;font-size:.86rem;color:var(--gold-light);font-weight:600;flex:1}
+  .pos-card-pnl{font-family:'Cinzel',serif;font-size:1rem;font-weight:700}
   .pos-card-pnl.pos{color:var(--green)}.pos-card-pnl.neg{color:var(--red)}
-  .pos-card-details{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;font-size:.68rem;color:var(--text-dim);margin-bottom:4px}
+  .pos-card-details{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;font-size:.76rem;color:var(--text-dim);margin-bottom:4px}
   .pos-card-detail span{color:var(--text);font-weight:600}
   .pos-card-orders{display:flex;gap:6px;margin-top:6px}
-  .order-tag{padding:3px 8px;border-radius:4px;font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:.5px}
+  .order-tag{padding:3px 8px;border-radius:4px;font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.5px}
   .order-tag.sl{background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.4);color:#ff9999}
   .order-tag.tp{background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.4);color:#99ffcc}
   .order-tag.none{background:rgba(107,74,34,.2);border:1px solid rgba(107,74,34,.4);color:var(--text-dim)}
   .btn-close-card{margin-top:8px;width:100%;background:rgba(0,0,0,.2);border:1px solid var(--border);
-    border-radius:5px;padding:6px;font-family:'Cinzel',serif;font-size:.68rem;color:var(--text-dim);
+    border-radius:5px;padding:7px;font-family:'Cinzel',serif;font-size:.76rem;color:var(--text-dim);
     cursor:pointer;transition:all .15s;text-transform:uppercase;letter-spacing:1px}
   .btn-close-card:hover{border-color:var(--gold-dark);color:var(--gold)}
-  .empty-holdings{text-align:center;padding:28px 20px;color:var(--text-dim);font-style:italic;font-size:.88rem}
+  .empty-holdings{text-align:center;padding:28px 20px;color:var(--text-dim);font-style:italic;font-size:.96rem}
 
   /* CHARTS PAGE */
   .chart-toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
@@ -180,25 +180,25 @@
   .hist-icon{font-size:1.3rem;flex-shrink:0;margin-top:1px}
   .hist-body{flex:1;min-width:0}
   .hist-top{display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap}
-  .hist-item-name{font-family:'Cinzel',serif;font-size:.76rem;color:var(--gold-light);font-weight:600;
+  .hist-item-name{font-family:'Cinzel',serif;font-size:.84rem;color:var(--gold-light);font-weight:600;
     flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .hist-dir-badge{font-family:'Cinzel',serif;font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:8px;flex-shrink:0}
+  .hist-dir-badge{font-family:'Cinzel',serif;font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:8px;flex-shrink:0}
   .hist-dir-badge.long{background:rgba(39,174,96,.18);border:1px solid rgba(39,174,96,.45);color:#7fffc4}
   .hist-dir-badge.short{background:rgba(192,57,43,.18);border:1px solid rgba(192,57,43,.45);color:#ffb3b3}
-  .hist-close-tag{font-size:.6rem;padding:2px 7px;border-radius:8px;flex-shrink:0;font-weight:600;letter-spacing:.5px}
+  .hist-close-tag{font-size:.68rem;padding:2px 7px;border-radius:8px;flex-shrink:0;font-weight:600;letter-spacing:.5px}
   .hist-close-tag.manual{background:rgba(107,74,34,.3);border:1px solid rgba(107,74,34,.5);color:var(--text-dim)}
   .hist-close-tag.sl{background:rgba(192,57,43,.18);border:1px solid rgba(192,57,43,.4);color:#ff9999}
   .hist-close-tag.tp{background:rgba(39,174,96,.18);border:1px solid rgba(39,174,96,.4);color:#99ffcc}
   .hist-close-tag.liq{background:rgba(255,102,0,.18);border:1px solid rgba(255,102,0,.4);color:#ffcc88}
-  .hist-details{display:flex;gap:10px;font-size:.68rem;color:var(--text-dim);flex-wrap:wrap}
+  .hist-details{display:flex;gap:10px;font-size:.76rem;color:var(--text-dim);flex-wrap:wrap}
   .hist-details span{white-space:nowrap}
   .hist-details .val{color:var(--text);font-weight:600}
-  .hist-pnl{font-family:'Cinzel',serif;font-size:.92rem;font-weight:700;flex-shrink:0;text-align:right;line-height:1;margin-top:2px}
+  .hist-pnl{font-family:'Cinzel',serif;font-size:1rem;font-weight:700;flex-shrink:0;text-align:right;line-height:1;margin-top:2px}
   .hist-pnl.pos{color:var(--green)}.hist-pnl.neg{color:var(--red)}
-  .hist-pnl-pct{font-size:.62rem;margin-top:3px;text-align:right}
+  .hist-pnl-pct{font-size:.7rem;margin-top:3px;text-align:right}
   .hist-pnl-pct.pos{color:#5deb8f}.hist-pnl-pct.neg{color:#ff8888}
-  .hist-time{font-size:.6rem;color:var(--text-dim);margin-top:4px;font-style:italic}
-  .hist-empty{text-align:center;padding:30px 20px;color:var(--text-dim);font-style:italic;font-size:.88rem}
+  .hist-time{font-size:.68rem;color:var(--text-dim);margin-top:4px;font-style:italic}
+  .hist-empty{text-align:center;padding:30px 20px;color:var(--text-dim);font-style:italic;font-size:.96rem}
   .hist-empty-icon{font-size:2rem;margin-bottom:8px;opacity:.5}
 
   /* LOT SIZE */
@@ -282,68 +282,72 @@
 
   /* MINI CLOSE BUTTON ON MARKET CARD */
   .market-close-row{display:flex;gap:6px;padding:6px 12px 8px;align-items:center}
-  .market-close-row .btn-trade{margin:0;flex:1;padding:8px 4px;font-size:.7rem}
+  .market-close-row .btn-trade{margin:0;flex:1;padding:8px 4px;font-size:.78rem}
   .btn-close-item{flex-shrink:0;background:rgba(192,57,43,.12);border:1px solid rgba(192,57,43,.4);
-    border-radius:6px;padding:8px 12px;font-family:'Cinzel',serif;font-size:.65rem;font-weight:600;
+    border-radius:6px;padding:8px 16px;font-family:'Cinzel',serif;font-size:.74rem;font-weight:600;
     color:#ffb3b3;cursor:pointer;transition:all .15s;text-align:center;letter-spacing:.5px;white-space:nowrap}
   .btn-close-item:hover{background:rgba(192,57,43,.25);border-color:#c0392b}
   .btn-close-item:active{transform:scale(.96)}
   .btn-close-item:disabled{opacity:.25;cursor:not-allowed}
 
   /* TREND SHIFT INDICATOR on cards */
-  .trend-badge{display:inline-flex;align-items:center;gap:3px;font-size:.6rem;
+  .trend-badge{display:inline-flex;align-items:center;gap:3px;font-size:.7rem;
     padding:1px 6px;border-radius:8px;font-weight:700;letter-spacing:.5px}
   .trend-badge.bull{background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.4);color:#7fffc4}
   .trend-badge.bear{background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.4);color:#ffb3b3}
   .trend-badge.flat{background:rgba(107,74,34,.2);border:1px solid rgba(107,74,34,.4);color:var(--text-dim)}
 
-
-    align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+  /* MODAL — centered popup near asset */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:300;
+    display:flex;align-items:flex-start;justify-content:center;
+    padding:0 12px;overflow-y:auto;
+    opacity:0;pointer-events:none;transition:opacity .2s}
   .modal-overlay.open{opacity:1;pointer-events:all}
   .modal{background:linear-gradient(180deg,#3d2510,#2d1a0a);border:2px solid var(--gold-dark);
-    border-bottom:none;border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:16px 16px 30px;
-    transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.2,.64,1);
-    box-shadow:0 -8px 32px rgba(0,0,0,.6)}
-  .modal-overlay.open .modal{transform:translateY(0)}
-  .modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 12px}
-  .modal-title{font-family:'Cinzel',serif;font-size:1rem;color:var(--gold);text-align:center;margin-bottom:4px;letter-spacing:1px}
-  .modal-price-display{text-align:center;font-size:.73rem;color:var(--text-dim);margin-bottom:14px}
-  .modal-price-display strong{font-family:'Cinzel',serif;color:var(--gold);font-size:1rem}
-  .modal-section-label{font-size:.66rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
-  .modal-lev-row{display:flex;gap:5px;margin-bottom:14px}
+    border-radius:14px;width:100%;max-width:460px;padding:16px 16px 20px;
+    transform:scale(.94) translateY(-8px);
+    transition:transform .25s cubic-bezier(.34,1.2,.64,1),opacity .2s;
+    box-shadow:0 8px 40px rgba(0,0,0,.7);margin-top:var(--modal-top,80px)}
+  .modal-overlay.open .modal{transform:scale(1) translateY(0)}
+  .modal-handle{display:none}
+  .modal-title{font-family:'Cinzel',serif;font-size:1.1rem;color:var(--gold);text-align:center;margin-bottom:4px;letter-spacing:1px}
+  .modal-price-display{text-align:center;font-size:.82rem;color:var(--text-dim);margin-bottom:12px}
+  .modal-price-display strong{font-family:'Cinzel',serif;color:var(--gold);font-size:1.05rem}
+  .modal-section-label{font-size:.74rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
+  .modal-lev-row{display:flex;gap:5px;margin-bottom:12px}
   .modal-lev-btn{flex:1;background:var(--panel);border:1.5px solid var(--border);border-radius:7px;padding:8px 2px;
-    font-family:'Cinzel',serif;font-size:.78rem;font-weight:600;color:var(--text-dim);cursor:pointer;text-align:center;transition:all .15s}
+    font-family:'Cinzel',serif;font-size:.84rem;font-weight:600;color:var(--text-dim);cursor:pointer;text-align:center;transition:all .15s}
   .modal-lev-btn.active{background:linear-gradient(135deg,#4a2e10,#2d1a08);border-color:var(--gold);color:var(--gold);box-shadow:0 0 8px rgba(240,192,64,.2)}
   .modal-lev-btn:hover:not(.active){border-color:var(--gold-dark);color:var(--text)}
   .modal-sltp-row{display:flex;gap:8px;margin-bottom:12px}
   .modal-field{flex:1}
-  .modal-field label{display:block;font-size:.64rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+  .modal-field label{display:block;font-size:.74rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
   .modal-field label.sl{color:#ff9999}.modal-field label.tp{color:#99ffcc}
   .modal-input{width:100%;background:rgba(0,0,0,.35);border:1.5px solid var(--border);border-radius:7px;
-    padding:8px 10px;color:var(--text);font-family:'Crimson Text',serif;font-size:.9rem;outline:none;transition:border-color .2s}
+    padding:8px 10px;color:var(--text);font-family:'Crimson Text',serif;font-size:1rem;outline:none;transition:border-color .2s}
   .modal-input:focus{border-color:var(--gold-dark)}
   .modal-input.sl:focus{border-color:#e74c3c}.modal-input.tp:focus{border-color:#2ecc71}
   .modal-input::placeholder{color:rgba(201,169,110,.35);font-style:italic}
   .modal-cost-info{background:rgba(0,0,0,.25);border:1px solid rgba(107,74,34,.3);border-radius:7px;
-    padding:8px 12px;font-size:.73rem;color:var(--text-dim);margin-bottom:14px}
+    padding:8px 12px;font-size:.8rem;color:var(--text-dim);margin-bottom:12px}
   .modal-cost-row{display:flex;justify-content:space-between;margin-bottom:2px}
   .modal-cost-row:last-child{margin-bottom:0}
-  .modal-cost-row strong{color:var(--text);font-family:'Cinzel',serif;font-size:.78rem}
+  .modal-cost-row strong{color:var(--text);font-family:'Cinzel',serif;font-size:.84rem}
   .modal-dir-btns{display:flex;gap:8px}
   .modal-btn-long{flex:1;background:linear-gradient(135deg,#1a5c32,#0f3d20);border:2px solid #27ae60;border-radius:8px;
-    padding:13px;font-family:'Cinzel',serif;font-size:.82rem;font-weight:700;color:#7fffc4;cursor:pointer;
+    padding:12px;font-family:'Cinzel',serif;font-size:.88rem;font-weight:700;color:#7fffc4;cursor:pointer;
     transition:all .15s;text-align:center;letter-spacing:.5px}
   .modal-btn-long:hover{background:linear-gradient(135deg,#1e6b3a,#124826);box-shadow:0 0 12px rgba(39,174,96,.3)}
   .modal-btn-long:active{transform:scale(.97)}
   .modal-btn-long:disabled{opacity:.3;cursor:not-allowed;transform:none}
   .modal-btn-short{flex:1;background:linear-gradient(135deg,#5c1a1a,#3d0f0f);border:2px solid #c0392b;border-radius:8px;
-    padding:13px;font-family:'Cinzel',serif;font-size:.82rem;font-weight:700;color:#ffb3b3;cursor:pointer;
+    padding:12px;font-family:'Cinzel',serif;font-size:.88rem;font-weight:700;color:#ffb3b3;cursor:pointer;
     transition:all .15s;text-align:center;letter-spacing:.5px}
   .modal-btn-short:hover{background:linear-gradient(135deg,#6b2020,#4d1212);box-shadow:0 0 12px rgba(192,57,43,.3)}
   .modal-btn-short:active{transform:scale(.97)}
   .modal-btn-short:disabled{opacity:.3;cursor:not-allowed;transform:none}
   .modal-cancel{width:100%;margin-top:8px;background:transparent;border:1px solid var(--border);border-radius:7px;
-    padding:8px;font-family:'Cinzel',serif;font-size:.68rem;color:var(--text-dim);cursor:pointer;
+    padding:8px;font-family:'Cinzel',serif;font-size:.76rem;color:var(--text-dim);cursor:pointer;
     transition:all .15s;text-transform:uppercase;letter-spacing:1px}
   .modal-cancel:hover{color:var(--text);border-color:var(--text-dim)}
 
@@ -590,6 +594,9 @@ ITEMS.forEach(function(item) {
 
 // ── PRICE ENGINE ─────────────────────────────────────────────────────────────
 function updatePrices() {
+  // Apply surge/crash overrides first
+  applyEventPrices();
+
   ITEMS.forEach(function(item) {
     lastPrices[item.id] = item.price;
     var chg = item.price * ((Math.random() - 0.48) * item.volatility + item.trend);
@@ -688,6 +695,7 @@ function shiftTrends() {
 }
 
 function showBreakingNews(ticksLeft) {
+  resetBannerStyle();
   document.getElementById('bn-headline').textContent = 'New trading session coming soon!';
   document.getElementById('bn-sub').textContent = '150-tick session ending — trend biases will reset across all assets';
   document.getElementById('bn-countdown').textContent = ticksLeft + ' ticks remaining';
@@ -704,7 +712,127 @@ function dismissNews() {
   clearTimeout(newsTimer);
 }
 
-// ── STROBE ────────────────────────────────────────────────────────────────────
+// ── PRICE SURGE / CRASH EVENTS ────────────────────────────────────────────────
+// Only ONE event (surge OR crash) can be active at any time — never both.
+// Each event: random asset, random duration 5-16 ticks, random magnitude 30-85%.
+// After an event ends, a cooldown of 20-45 ticks before the next one fires.
+// Events alternate: if last was surge, next is crash, and vice versa.
+
+var activeEvent   = null; // { type:'surge'|'crash', itemId, ticksLeft, perTick, totalPct, ticks }
+var lastEventType = null; // tracks alternation
+var nextEventAt   = 15 + Math.floor(Math.random() * 25); // first event: tick 15-40
+
+function pickRandomItem(excludeId) {
+  var pool = ITEMS.filter(function(i){ return i.id !== excludeId; });
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function startEvent(type) {
+  var excludeId = null; // no exclusion needed since only one event at a time
+  var item      = pickRandomItem(excludeId);
+  var ticks     = 5 + Math.floor(Math.random() * 12);           // 5–16 ticks
+  var totalPct, perTick;
+
+  if (type === 'surge') {
+    totalPct = 0.30 + Math.random() * 0.55;                     // 30–85% gain
+    perTick  = Math.pow(1 + totalPct, 1 / ticks) - 1;
+  } else {
+    totalPct = 0.25 + Math.random() * 0.45;                     // 25–70% drop
+    perTick  = 1 - Math.pow(1 - totalPct, 1 / ticks);
+  }
+
+  activeEvent   = { type: type, itemId: item.id, ticksLeft: ticks, perTick: perTick, totalPct: totalPct, ticks: ticks };
+  lastEventType = type;
+  showEventBanner(type, item, ticks, totalPct);
+}
+
+function showEventBanner(type, item, ticks, eventPct) {
+  var pctStr = Math.round(eventPct * 100) + '%';
+  var secStr = (ticks * TICK_MS / 1000).toFixed(0) + 's';
+  var bar    = document.getElementById('bn-bar');
+  var label  = document.getElementById('bn-label');
+
+  if (type === 'surge') {
+    document.getElementById('bn-headline').textContent = item.icon + '  ' + item.name + ' SURGING  +' + pctStr + '!';
+    document.getElementById('bn-sub').textContent      = 'Strong upward move across ~' + ticks + ' ticks (' + secStr + ')  —  act fast!';
+    if (bar)   { bar.style.background = 'linear-gradient(135deg,#0a4a1a,#1a7a32,#0a4a1a)'; bar.style.borderBottomColor = '#2ecc71'; }
+    if (label) { label.style.background = '#1a8a30'; label.textContent = '📈 Surge'; }
+  } else {
+    document.getElementById('bn-headline').textContent = item.icon + '  ' + item.name + ' CRASHING  -' + pctStr + '!';
+    document.getElementById('bn-sub').textContent      = 'Strong downward move across ~' + ticks + ' ticks (' + secStr + ')  —  watch out!';
+    if (bar)   { bar.style.background = 'linear-gradient(135deg,#4a0a0a,#7a1a1a,#4a0a0a)'; bar.style.borderBottomColor = '#e74c3c'; }
+    if (label) { label.style.background = '#8a1a1a'; label.textContent = '📉 Crash'; }
+  }
+
+  document.getElementById('bn-countdown').textContent = ticks + ' ticks';
+  document.getElementById('breaking-news').classList.add('show');
+  clearTimeout(newsTimer);
+}
+
+function updateEventBannerCountdown() {
+  if (!activeEvent) return;
+  var el = document.getElementById('bn-countdown');
+  if (el) el.textContent = activeEvent.ticksLeft + ' ticks left';
+}
+
+function resetBannerStyle() {
+  var bar   = document.getElementById('bn-bar');
+  var label = document.getElementById('bn-label');
+  if (bar)   { bar.style.background = ''; bar.style.borderBottomColor = ''; }
+  if (label) { label.style.background = ''; label.textContent = '📡 Breaking'; }
+}
+
+function applyEventPrices() {
+  if (!activeEvent) return;
+
+  var item = getItem(activeEvent.itemId);
+  if (item) {
+    if (activeEvent.type === 'surge') {
+      item.price = Math.round(item.price * (1 + activeEvent.perTick) * 100) / 100;
+    } else {
+      item.price = Math.max(5, Math.round(item.price * (1 - activeEvent.perTick) * 100) / 100);
+    }
+  }
+
+  activeEvent.ticksLeft--;
+
+  if (activeEvent.ticksLeft <= 0) {
+    var doneType = activeEvent.type;
+    var doneName = item ? item.name : '';
+    activeEvent = null;
+    resetBannerStyle();
+    dismissNews();
+
+    if (doneType === 'surge') {
+      showToast(doneName + ' surge complete! +' + '-- gp', 'tp-hit');
+    } else {
+      showToast(doneName + ' crash complete!', 'sl-hit');
+    }
+
+    // Schedule next event: 20-50 ticks cooldown, then alternate type
+    nextEventAt = tickCount + 20 + Math.floor(Math.random() * 30);
+  }
+}
+
+function maybeFireEvent() {
+  // Never fire if an event is already active
+  if (activeEvent) {
+    updateEventBannerCountdown();
+    return;
+  }
+  if (tickCount < nextEventAt) return;
+
+  // Alternate: if last was surge fire crash, if last was crash fire surge,
+  // if no history pick randomly
+  var nextType;
+  if (lastEventType === 'surge')       nextType = 'crash';
+  else if (lastEventType === 'crash')  nextType = 'surge';
+  else                                 nextType = Math.random() < 0.5 ? 'surge' : 'crash';
+
+  startEvent(nextType);
+}
+
+
 function strobeChart(itemId, direction) {
   var wrap = document.querySelector('#card-' + itemId + ' .chart-wrap');
   if (!wrap) return;
@@ -973,12 +1101,32 @@ function drawChart(el, item, miniMode) {
 function openModal(itemId) {
   modalItemId = itemId; modalLev = 1;
   var item = getItem(itemId);
-  document.getElementById('modal-title').textContent = item.name;
+  document.getElementById('modal-title').textContent = item.icon + '  ' + item.name;
   document.getElementById('modal-sl').value  = '';
   document.getElementById('modal-tp').value  = '';
   document.getElementById('modal-lot').value = '1';
   setLev(1);
+
+  // Position modal near the asset card
+  var card = document.getElementById('card-' + itemId);
+  var topOffset = 80; // default fallback
+  if (card) {
+    var rect = card.getBoundingClientRect();
+    var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    topOffset = Math.max(70, rect.top + scrollTop - 10);
+    // If card is near bottom, show above it
+    var modalH = 520;
+    if (rect.bottom + modalH > window.innerHeight + scrollTop) {
+      topOffset = Math.max(70, rect.top + scrollTop - modalH - 10);
+    }
+  }
+  document.getElementById('modal').style.marginTop = topOffset + 'px';
   document.getElementById('modal-overlay').classList.add('open');
+  // Scroll overlay to show modal
+  setTimeout(function() {
+    var overlay = document.getElementById('modal-overlay');
+    overlay.scrollTop = Math.max(0, topOffset - 60);
+  }, 50);
 }
 function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
 document.getElementById('modal-overlay').addEventListener('click', function(e) {
@@ -1174,8 +1322,8 @@ function renderMarket() {
       h += '<div class="chart-wrap"><canvas class="price-chart" id="mchart-' + item.id + '"></canvas><div class="chart-ohlc-bar" id="ohlc-' + item.id + '"></div></div>';
       h += '<div id="posbar-' + item.id + '"></div>';
       h += '<div class="market-close-row">';
-      h +=   '<button class="btn-trade" style="margin:0;flex:2" onclick="openModal(\'' + item.id + '\')">Open Trade</button>';
-      h +=   '<button class="btn-close-item" id="closeitem-' + item.id + '" onclick="closeItemPositions(\'' + item.id + '\')">Close All</button>';
+      h +=   '<button class="btn-trade" style="margin:0;flex:1" onclick="openModal(\'' + item.id + '\')">Open Trade</button>';
+      h +=   '<button class="btn-close-item" id="closeitem-' + item.id + '" onclick="closeItemPositions(\'' + item.id + '\')">Close</button>';
       h += '</div>';
       card.innerHTML = h;
       container.appendChild(card);
@@ -1466,15 +1614,21 @@ function tick() {
   document.getElementById('tick-label').textContent = 'Tick #' + tickCount;
   setTimeout(function(){ dot.style.background = 'var(--green)'; }, 300);
 
-  // Trend shift
+  // Session trend shift — only show warning when no price event is active
   var ticksToShift = nextShiftAt - tickCount;
-  if (ticksToShift === WARNING_TICKS) {
-    showBreakingNews(ticksToShift);
-  } else if (ticksToShift < WARNING_TICKS && ticksToShift > 0) {
-    updateNewsCountdown(ticksToShift);
-  } else if (tickCount >= nextShiftAt) {
+  if (!activeEvent) {
+    if (ticksToShift === WARNING_TICKS) {
+      showBreakingNews(ticksToShift);
+    } else if (ticksToShift < WARNING_TICKS && ticksToShift > 0) {
+      updateNewsCountdown(ticksToShift);
+    }
+  }
+  if (tickCount >= nextShiftAt) {
     shiftTrends();
   }
+
+  // Fire or advance price events (surge/crash — never both at once)
+  maybeFireEvent();
 
   updatePrices();
 
