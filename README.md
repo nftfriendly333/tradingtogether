@@ -515,6 +515,8 @@
     <div class="modal-cost-info" id="modal-cost-info">
       <div class="modal-cost-row"><span>Margin required</span><strong id="modal-margin">--</strong></div>
       <div class="modal-cost-row"><span>Notional exposure</span><strong id="modal-notional">--</strong></div>
+      <div class="modal-cost-row"><span style="color:#ff9999">Opening fee</span><strong id="modal-fee" style="color:#ff9999">--</strong></div>
+      <div class="modal-cost-row"><span>Total cost</span><strong id="modal-total-cost">--</strong></div>
       <div class="modal-cost-row"><span>Your free cash</span><strong id="modal-cash">--</strong></div>
       <div class="modal-cost-row" style="margin-top:4px;padding-top:4px;border-top:1px solid rgba(107,74,34,.3)">
         <span>Portfolio at risk</span><strong id="modal-pct-row" style="color:var(--green)">--%</strong>
@@ -561,7 +563,7 @@ var CANDLE_TICKS      = 3;
 var MA_PERIOD         = 20;
 var STARTING_GP       = 1000;
 var MARGIN_RATE       = 0.2;
-var TREND_SHIFT_TICKS = 500;
+var TREND_SHIFT_TICKS = 150;
 var WARNING_TICKS     = 50;
 
 var wallet        = STARTING_GP;
@@ -687,10 +689,9 @@ function shiftTrends() {
 
 function showBreakingNews(ticksLeft) {
   document.getElementById('bn-headline').textContent = 'New trading session coming soon!';
-  document.getElementById('bn-sub').textContent = 'Market trend biases will reset across all assets';
+  document.getElementById('bn-sub').textContent = '150-tick session ending — trend biases will reset across all assets';
   document.getElementById('bn-countdown').textContent = ticksLeft + ' ticks remaining';
   document.getElementById('breaking-news').classList.add('show');
-  // Do NOT auto-dismiss — keep it until the session actually shifts
 }
 
 function updateNewsCountdown(ticksLeft) {
@@ -1027,6 +1028,11 @@ function updateModalCost() {
   document.getElementById('modal-margin').textContent   = fmt(margin) + ' gp';
   document.getElementById('modal-notional').textContent = fmt(notional) + ' gp (' + modalLev + 'x, ' + lots + ' lot' + (lots > 1 ? 's' : '') + ')';
   document.getElementById('modal-cash').textContent     = fmt(wallet) + ' gp';
+  var fee = Math.round(margin * 0.01);
+  var feeEl = document.getElementById('modal-fee');
+  if (feeEl) feeEl.textContent = fmt(fee) + ' gp (1%)';
+  var totalEl = document.getElementById('modal-total-cost');
+  if (totalEl) totalEl.textContent = fmt(margin + fee) + ' gp';
 
   var pctRow = document.getElementById('modal-pct-row');
   if (pctRow) {
@@ -1034,7 +1040,7 @@ function updateModalCost() {
     pctRow.style.color = pctColor;
   }
 
-  var ok = wallet >= margin;
+  var ok = wallet >= (margin + Math.round(margin * 0.01));
   document.getElementById('modal-btn-long').disabled  = !ok;
   document.getElementById('modal-btn-short').disabled = !ok;
 }
@@ -1043,7 +1049,8 @@ function openTrade(dir) {
   var item   = getItem(modalItemId);
   var lots   = getLots();
   var margin = Math.round(item.price * MARGIN_RATE * lots);
-  if (wallet < margin) { showToast('Not enough gold for margin!', 'error'); return; }
+  var fee = Math.round(margin * 0.01);
+  if (wallet < margin + fee) { showToast('Not enough gold for margin + fee!', 'error'); return; }
   var slRaw = document.getElementById('modal-sl').value;
   var tpRaw = document.getElementById('modal-tp').value;
   var sl = slRaw ? parseFloat(slRaw) : null;
@@ -1071,15 +1078,16 @@ function openTrade(dir) {
 }
 
 function executeTrade(trade) {
-  wallet -= trade.margin;
+  var fee = Math.round(trade.margin * 0.01);
+  wallet -= trade.margin + fee;
   positions.push({
     id: ++posIdCounter, itemId: modalItemId,
     direction: trade.dir, entryPrice: trade.item.price,
     leverage: modalLev, margin: trade.margin,
-    lots: trade.lots, sl: trade.sl, tp: trade.tp
+    lots: trade.lots, sl: trade.sl, tp: trade.tp, fee: fee
   });
   var d = trade.dir === 'long' ? 'Long' : 'Short';
-  showToast(d + ' ' + modalLev + 'x x' + trade.lots + ' opened on ' + trade.item.name + ' @ ' + fmt(trade.item.price) + ' gp', trade.dir === 'long' ? 'buy' : 'sell');
+  showToast(d + ' ' + modalLev + 'x x' + trade.lots + ' opened on ' + trade.item.name + ' @ ' + fmt(trade.item.price) + ' gp (fee: ' + fmt(fee) + ' gp)', trade.dir === 'long' ? 'buy' : 'sell');
   closeModal();
   pendingTrade = null;
   renderAll();
@@ -1295,6 +1303,7 @@ function renderPortfolio() {
     html +=   '<div class="pos-card-details">';
     html +=     '<div class="pos-card-detail">Now <span>' + fmt(item.price) + '</span></div>';
     html +=     '<div class="pos-card-detail">Margin <span>' + fmt(pos.margin) + ' gp</span></div>';
+    html +=     '<div class="pos-card-detail">Fee paid <span style="color:#ff9999">' + fmt(pos.fee || 0) + ' gp</span></div>';
     html +=     '<div class="pos-card-detail">Return <span style="color:' + retColor + '">' + fmtPct(pnlPct) + '</span></div>';
     html +=   '</div>';
     html +=   '<div class="pos-card-orders">' + slTag + tpTag + '</div>';
