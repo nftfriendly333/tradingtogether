@@ -297,7 +297,19 @@
   .trend-badge.bear{background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.4);color:#ffb3b3}
   .trend-badge.flat{background:rgba(107,74,34,.2);border:1px solid rgba(107,74,34,.4);color:var(--text-dim)}
 
-  /* MODAL — centered popup near asset */
+  /* CHART LEGEND */
+  .chart-legend-bar{background:rgba(0,0,0,.2);border:1px solid rgba(107,74,34,.3);border-radius:8px;
+    padding:10px 12px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px}
+  .legend-item{display:flex;align-items:flex-start;gap:10px}
+  .legend-ma-line{flex-shrink:0;width:28px;height:2px;margin-top:7px;
+    background:repeating-linear-gradient(90deg,#f0c040 0,#f0c040 5px,transparent 5px,transparent 9px);
+    border-radius:1px}
+  .legend-session-line{flex-shrink:0;width:2px;height:28px;margin-top:2px;
+    background:rgba(240,192,64,.6)}
+  .legend-liq-line{flex-shrink:0;width:28px;height:2px;margin-top:7px;background:#ff4500}
+  .legend-desc{font-size:.72rem;color:var(--text-dim);line-height:1.4;display:block}
+
+
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:300;
     display:flex;align-items:flex-start;justify-content:center;
     padding:0 12px;overflow-y:auto;
@@ -394,6 +406,7 @@
     <span class="wallet-value" id="wallet-display">1,000</span>
     <span style="font-size:.72rem;color:var(--text-dim)">gp</span>
   </div>
+  <div id="save-indicator" style="font-size:.58rem;color:rgba(201,169,110,.4);margin-top:3px;letter-spacing:1px">💾 Auto-saving</div>
 </div>
 
 <div class="tabs">
@@ -414,6 +427,30 @@
         <div class="tick-indicator">
           <div class="tick-dot" id="tick-dot"></div>
           <span id="tick-label">Live</span>
+        </div>
+      </div>
+    </div>
+    <!-- Chart Legend -->
+    <div class="chart-legend-bar">
+      <div class="legend-item">
+        <span class="legend-ma-line"></span>
+        <div>
+          <span class="legend-label">MA20</span>
+          <span class="legend-desc">Moving Average — the average closing price of the last 20 candles. When price is above MA20 the market is trending up; below means trending down.</span>
+        </div>
+      </div>
+      <div class="legend-item">
+        <span class="legend-session-line"></span>
+        <div>
+          <span class="legend-label">Session End</span>
+          <span class="legend-desc">Vertical dashed line marking where a 150-tick trading session ended and trend biases were reset.</span>
+        </div>
+      </div>
+      <div class="legend-item">
+        <span class="legend-liq-line"></span>
+        <div>
+          <span class="legend-label">Liquidation Price</span>
+          <span class="legend-desc">Dashed orange-red line showing the price at which your open position would be automatically liquidated (95% margin loss). ▲ = Long, ▼ = Short.</span>
         </div>
       </div>
     </div>
@@ -568,7 +605,7 @@ var MA_PERIOD         = 20;
 var STARTING_GP       = 1000;
 var MARGIN_RATE       = 0.2;
 var TREND_SHIFT_TICKS = 150;
-var WARNING_TICKS     = 50;
+var WARNING_TICKS     = 25;
 
 var wallet        = STARTING_GP;
 var positions     = [];
@@ -583,6 +620,7 @@ var chartMode     = 'candle';
 var nextShiftAt   = TREND_SHIFT_TICKS;
 var newsTimer     = null;
 var strobeTimers  = {};
+var sessionBoundaries = []; // tick counts where sessions ended, used to draw vertical lines
 
 ITEMS.forEach(function(item) {
   lastPrices[item.id] = item.price;
@@ -688,6 +726,9 @@ function randomTrend() {
 }
 
 function shiftTrends() {
+  sessionBoundaries.push(tickCount);
+  // Keep only last 60 boundaries (more than enough for chart history)
+  if (sessionBoundaries.length > 60) sessionBoundaries.shift();
   ITEMS.forEach(function(item) { item.trend = randomTrend(); });
   nextShiftAt = tickCount + TREND_SHIFT_TICKS;
   dismissNews();
@@ -730,7 +771,7 @@ function pickRandomItem(excludeId) {
 function startEvent(type) {
   var excludeId = null; // no exclusion needed since only one event at a time
   var item      = pickRandomItem(excludeId);
-  var ticks     = 5 + Math.floor(Math.random() * 12);           // 5–16 ticks
+  var ticks     = 4 + Math.floor(Math.random() * 8);            // 4–11 ticks
   var totalPct, perTick;
 
   if (type === 'surge') {
@@ -871,6 +912,7 @@ function closeAllPositions() {
   });
   positions = [];
   showToast('Closed ' + count + ' position' + (count > 1 ? 's' : '') + ' | ' + fmtPnl(Math.round(totalPnl)) + ' gp total', totalPnl >= 0 ? 'buy' : 'sell');
+  scheduleSave();
   renderAll();
 }
 
@@ -887,6 +929,7 @@ function closeItemPositions(itemId) {
   });
   positions = positions.filter(function(p){ return p.itemId !== itemId; });
   showToast('Closed ' + item.name + ' positions | ' + fmtPnl(Math.round(totalPnl)) + ' gp', totalPnl >= 0 ? 'buy' : 'sell');
+  scheduleSave();
   renderAll();
 }
 
@@ -917,7 +960,7 @@ function calcMA(candles, period) {
   return result;
 }
 
-function drawCandleChart(el, candles, miniMode) {
+function drawCandleChart(el, candles, miniMode, item) {
   var dpr  = window.devicePixelRatio || 1;
   var w    = el.offsetWidth * dpr;
   var h    = el.offsetHeight * dpr;
@@ -934,19 +977,24 @@ function drawCandleChart(el, candles, miniMode) {
   var W    = w - padL - padR;
   var H    = h - padT - padB;
 
-  // Price range
+  // Gather open positions for this item to get liquidation prices
+  var itemPositions = item ? positions.filter(function(p){ return p.itemId === item.id; }) : [];
+  var liqPrices = itemPositions.map(function(p){ return calcLiqPrice(p); });
+
+  // Price range — expand to include all liquidation prices
   var allH = candles.map(function(c){ return c.h; });
   var allL = candles.map(function(c){ return c.l; });
   var mn   = Math.min.apply(null, allL);
   var mx   = Math.max.apply(null, allH);
+  liqPrices.forEach(function(lp) { mn = Math.min(mn, lp); mx = Math.max(mx, lp); });
   var pad  = (mx - mn) * 0.08 || 1;
   mn -= pad; mx += pad;
   var rng  = mx - mn;
 
   var py = function(v) { return padT + H - ((v - mn) / rng) * H; };
   var n  = candles.length;
-  var cw = W / n; // candle slot width
-  var bw = Math.max(1 * dpr, cw * 0.55); // body width
+  var cw = W / n;
+  var bw = Math.max(1 * dpr, cw * 0.55);
 
   // Grid lines (full chart only)
   if (!miniMode) {
@@ -1010,6 +1058,29 @@ function drawCandleChart(el, candles, miniMode) {
   ctx.stroke();
   ctx.setLineDash([]);
 
+  // Session boundary vertical lines
+  // Each candle covers CANDLE_TICKS ticks. Most recent candle = tickCount.
+  // Work backwards: candle[n-1] ended at tickCount, candle[n-2] at tickCount - CANDLE_TICKS, etc.
+  var candleCount = candles.length;
+  sessionBoundaries.forEach(function(boundaryTick) {
+    // How many ticks ago did this boundary happen?
+    var ticksAgo = tickCount - boundaryTick;
+    if (ticksAgo < 0) return;
+    // Which candle index does this correspond to?
+    var candleAgo = ticksAgo / CANDLE_TICKS;
+    var candleIdx = candleCount - 1 - candleAgo;
+    if (candleIdx < 0 || candleIdx >= candleCount) return;
+    var lineX = padL + (candleIdx + 0.5) * cw;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(240,192,64,0.55)';
+    ctx.lineWidth   = 1.5 * dpr;
+    ctx.beginPath();
+    ctx.moveTo(lineX, padT);
+    ctx.lineTo(lineX, padT + H);
+    ctx.stroke();
+    ctx.restore();
+  });
+
   // Current price line (full chart only)
   if (!miniMode && candles.length > 0) {
     var lastC  = candles[candles.length - 1];
@@ -1025,9 +1096,46 @@ function drawCandleChart(el, candles, miniMode) {
     ctx.font      = 'bold ' + (9 * dpr) + 'px monospace';
     ctx.fillText(Math.round(lastC.c), padL + W - 32 * dpr, lineY - 2 * dpr);
   }
+
+  // Liquidation lines per open position
+  itemPositions.forEach(function(pos) {
+    var liqPrice = calcLiqPrice(pos);
+    var liqY     = py(liqPrice);
+    // Only draw if within visible range
+    if (liqY < padT - 2 * dpr || liqY > padT + H + 2 * dpr) return;
+    var isLong   = pos.direction === 'long';
+    var liqColor = '#ff4500'; // bright orange-red for liquidation
+
+    ctx.save();
+    ctx.strokeStyle = liqColor;
+    ctx.lineWidth   = 1.5 * dpr;
+    ctx.beginPath();
+    ctx.moveTo(padL, liqY);
+    ctx.lineTo(padL + W, liqY);
+    ctx.stroke();
+
+    // Label on right edge
+    ctx.fillStyle = liqColor;
+    ctx.font = 'bold ' + (8 * dpr) + 'px monospace';
+    ctx.textAlign = 'right';
+    var label = 'LIQ ' + (isLong ? '▲' : '▼') + ' ' + Math.round(liqPrice);
+    ctx.fillText(label, padL + W - 1 * dpr, liqY - 2 * dpr);
+    ctx.textAlign = 'left';
+
+    // Small filled triangle marker on the right edge
+    var triSize = 5 * dpr;
+    ctx.beginPath();
+    ctx.moveTo(padL + W, liqY);
+    ctx.lineTo(padL + W - triSize, liqY - triSize);
+    ctx.lineTo(padL + W - triSize, liqY + triSize);
+    ctx.closePath();
+    ctx.fillStyle = liqColor;
+    ctx.fill();
+    ctx.restore();
+  });
 }
 
-function drawLineChart(el, history, miniMode) {
+function drawLineChart(el, history, miniMode, item) {
   var dpr = window.devicePixelRatio || 1;
   var w   = el.offsetWidth * dpr;
   var h   = el.offsetHeight * dpr;
@@ -1040,8 +1148,15 @@ function drawLineChart(el, history, miniMode) {
   var padT = (miniMode ? pad : 18 * dpr);
   var padB = (miniMode ? pad : 22 * dpr);
   var W    = w - pad * 2, H = h - padT - padB;
+
+  // Gather open positions for this item
+  var itemPositions = item ? positions.filter(function(p){ return p.itemId === item.id; }) : [];
+  var liqPrices = itemPositions.map(function(p){ return calcLiqPrice(p); });
+
+  // Expand price range to include liquidation prices
   var mn   = Math.min.apply(null, data) * 0.97;
   var mx   = Math.max.apply(null, data) * 1.03;
+  liqPrices.forEach(function(lp) { mn = Math.min(mn, lp * 0.97); mx = Math.max(mx, lp * 1.03); });
   var rng  = mx - mn || 1;
   var px   = function(i){ return pad + (i / (data.length - 1)) * W; };
   var py   = function(v){ return padT + H - ((v - mn) / rng) * H; };
@@ -1087,13 +1202,76 @@ function drawLineChart(el, history, miniMode) {
   ctx.beginPath();
   ctx.arc(px(data.length - 1), py(data[data.length - 1]), 3 * dpr, 0, Math.PI * 2);
   ctx.fillStyle = color; ctx.fill();
+
+  // Session boundary vertical lines on line chart
+  // Each data point = 1 tick. Most recent data point = tickCount.
+  var dataLen = data.length;
+  sessionBoundaries.forEach(function(boundaryTick) {
+    var ticksAgo = tickCount - boundaryTick;
+    if (ticksAgo < 0 || ticksAgo >= dataLen) return;
+    var dataIdx = dataLen - 1 - ticksAgo;
+    var lineX = px(dataIdx);
+    ctx.save();
+    ctx.strokeStyle = 'rgba(240,192,64,0.55)';
+    ctx.lineWidth   = 1.5 * dpr;
+    ctx.beginPath();
+    ctx.moveTo(lineX, padT);
+    ctx.lineTo(lineX, padT + H);
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  // Liquidation lines per open position
+  itemPositions.forEach(function(pos) {
+    var liqPrice = calcLiqPrice(pos);
+    var liqY     = py(liqPrice);
+    if (liqY < padT - 2 * dpr || liqY > padT + H + 2 * dpr) return;
+    var isLong   = pos.direction === 'long';
+    var liqColor = '#ff4500';
+
+    ctx.save();
+    ctx.strokeStyle = liqColor;
+    ctx.lineWidth   = 1.5 * dpr;
+    ctx.beginPath();
+    ctx.moveTo(pad, liqY);
+    ctx.lineTo(pad + W, liqY);
+    ctx.stroke();
+
+    if (!miniMode) {
+      ctx.fillStyle = liqColor;
+      ctx.font = 'bold ' + (8 * dpr) + 'px monospace';
+      ctx.textAlign = 'right';
+      var label = 'LIQ ' + (isLong ? '▲' : '▼') + ' ' + Math.round(liqPrice);
+      ctx.fillText(label, pad + W - 1 * dpr, liqY - 2 * dpr);
+      ctx.textAlign = 'left';
+      var triSize = 5 * dpr;
+      ctx.beginPath();
+      ctx.moveTo(pad + W, liqY);
+      ctx.lineTo(pad + W - triSize, liqY - triSize);
+      ctx.lineTo(pad + W - triSize, liqY + triSize);
+      ctx.closePath();
+      ctx.fillStyle = liqColor;
+      ctx.fill();
+    }
+    ctx.restore();
+  });
+}
+
+function calcLiqPrice(pos) {
+  var units = (pos.margin / pos.entryPrice) * pos.leverage;
+  var liqLoss = pos.margin * 0.95;
+  if (pos.direction === 'long') {
+    return pos.entryPrice - liqLoss / units;
+  } else {
+    return pos.entryPrice + liqLoss / units;
+  }
 }
 
 function drawChart(el, item, miniMode) {
   if (chartMode === 'candle') {
-    drawCandleChart(el, item.candles, miniMode);
+    drawCandleChart(el, item.candles, miniMode, item);
   } else {
-    drawLineChart(el, item.history, miniMode);
+    drawLineChart(el, item.history, miniMode, item);
   }
 }
 
@@ -1238,6 +1416,7 @@ function executeTrade(trade) {
   showToast(d + ' ' + modalLev + 'x x' + trade.lots + ' opened on ' + trade.item.name + ' @ ' + fmt(trade.item.price) + ' gp (fee: ' + fmt(fee) + ' gp)', trade.dir === 'long' ? 'buy' : 'sell');
   closeModal();
   pendingTrade = null;
+  scheduleSave();
   renderAll();
 }
 
@@ -1260,6 +1439,7 @@ function closePosition(posId) {
   positions = positions.filter(function(p){ return p.id !== posId; });
   var d = pos.direction === 'long' ? 'Long' : 'Short';
   showToast('Closed ' + d + ' ' + item.name + ': ' + fmtPnl(Math.round(pnl)) + ' gp', pnl >= 0 ? 'buy' : 'sell');
+  scheduleSave();
   renderAll();
 }
 
@@ -1640,9 +1820,130 @@ function tick() {
   });
 }
 
+// ── LOCAL STORAGE SAVE / LOAD ─────────────────────────────────────────────────
+var SAVE_KEY = 'tradeTogether_v1';
+var saveTimer = null;
+
+function saveState() {
+  try {
+    var itemSnapshots = ITEMS.map(function(item) {
+      return {
+        id: item.id,
+        price: item.price,
+        trend: item.trend,
+        volatility: item.volatility,
+        history: item.history.slice(-MAX_HISTORY),
+        candles: item.candles.slice(-60)
+      };
+    });
+    var state = {
+      wallet: wallet,
+      positions: positions,
+      tradeHistory: tradeHistory,
+      posIdCounter: posIdCounter,
+      tickCount: tickCount,
+      chartMode: chartMode,
+      nextShiftAt: nextShiftAt,
+      sessionBoundaries: sessionBoundaries,
+      items: itemSnapshots,
+      savedAt: Date.now()
+    };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+    // Flash save indicator
+    var ind = document.getElementById('save-indicator');
+    if (ind) {
+      ind.style.color = 'rgba(39,174,96,.8)';
+      ind.textContent = '💾 Saved';
+      setTimeout(function() {
+        ind.style.color = 'rgba(201,169,110,.4)';
+        ind.textContent = '💾 Auto-saving';
+      }, 1500);
+    }
+  } catch(e) {
+    console.warn('Save failed:', e);
+  }
+}
+
+function loadState() {
+  try {
+    var raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return false;
+    var state = JSON.parse(raw);
+    if (!state || typeof state.wallet !== 'number') return false;
+
+    wallet        = state.wallet;
+    positions     = state.positions     || [];
+    tradeHistory  = state.tradeHistory  || [];
+    posIdCounter  = state.posIdCounter  || 0;
+    tickCount     = state.tickCount     || 0;
+    chartMode     = state.chartMode     || 'candle';
+    nextShiftAt   = state.nextShiftAt   || TREND_SHIFT_TICKS;
+    sessionBoundaries = state.sessionBoundaries || [];
+
+    // Restore item prices, history and candles
+    if (state.items && state.items.length) {
+      state.items.forEach(function(snap) {
+        var item = getItem(snap.id);
+        if (!item) return;
+        item.price      = snap.price      || item.price;
+        item.trend      = snap.trend      || item.trend;
+        item.volatility = snap.volatility || item.volatility;
+        if (snap.history && snap.history.length) item.history = snap.history;
+        if (snap.candles && snap.candles.length) item.candles = snap.candles;
+        lastPrices[item.id] = item.price;
+      });
+    }
+
+    // Show how long ago they last played
+    var ago = Math.round((Date.now() - (state.savedAt || Date.now())) / 60000);
+    var agoStr = ago < 1 ? 'just now' : ago + ' min ago';
+    showToast('Session restored — last saved ' + agoStr, 'tp-hit');
+    return true;
+  } catch(e) {
+    console.warn('Load failed:', e);
+    return false;
+  }
+}
+
+function resetState() {
+  if (!confirm('Reset everything and start with 1,000 gp? This cannot be undone.')) return;
+  try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
+  wallet       = STARTING_GP;
+  positions    = [];
+  tradeHistory = [];
+  posIdCounter = 0;
+  tickCount    = 0;
+  chartMode    = 'candle';
+  nextShiftAt  = TREND_SHIFT_TICKS;
+  ITEMS.forEach(function(item) {
+    item.price   = item.basePrice || item.price;
+    item.history = [];
+    item.candles = [];
+    item.candleTickBuf = [];
+    lastPrices[item.id] = item.price;
+    for (var i = 0; i < 20; i++) item.history.push(item.price);
+    for (var j = 0; j < 15; j++) item.candles.push({ o: item.price, h: item.price, l: item.price, c: item.price });
+  });
+  renderAll();
+  showToast('Fresh start! 1,000 gp loaded.', 'buy');
+}
+
+// Debounced auto-save every 5 seconds after any state change
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveState, 5000);
+}
+
 window.addEventListener('load', function() {
+  // Try to restore saved session
+  var restored = loadState();
+
   renderAll();
   setInterval(tick, TICK_MS);
+
+  // Auto-save every 10 seconds regardless
+  setInterval(saveState, 10000);
+
   window.addEventListener('resize', function(){ renderMarket(); });
 });
 </script>
