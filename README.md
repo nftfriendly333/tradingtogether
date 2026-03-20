@@ -201,6 +201,18 @@
   .hist-empty{text-align:center;padding:30px 20px;color:var(--text-dim);font-style:italic;font-size:.96rem}
   .hist-empty-icon{font-size:2rem;margin-bottom:8px;opacity:.5}
 
+  /* SL/TP PERCENTAGE PRESETS */
+  .sltp-preset{background:var(--panel);border:1px solid var(--border);border-radius:5px;
+    padding:3px 0;font-family:'Cinzel',serif;font-size:.65rem;color:var(--text-dim);
+    cursor:pointer;transition:all .15s;flex:1;text-align:center}
+  .sl-preset:hover,.sl-preset.active{background:rgba(192,57,43,.2);border-color:#c0392b;color:#ff9999}
+  .tp-preset:hover,.tp-preset.active{background:rgba(39,174,96,.2);border-color:#27ae60;color:#99ffcc}
+  .sltp-suffix{position:absolute;right:10px;top:50%;transform:translateY(-50%);
+    font-family:'Cinzel',serif;font-size:.82rem;color:var(--text-dim);pointer-events:none}
+  .sltp-price-hint{font-size:.68rem;color:var(--text-dim);margin-top:3px;min-height:14px;font-style:italic}
+  .sltp-price-hint.sl-hint{color:#ff9999}
+  .sltp-price-hint.tp-hint{color:#99ffcc}
+
   /* LOT SIZE */
   .modal-lot-row{display:flex;align-items:center;gap:8px;margin-bottom:14px}
   .lot-btn{width:36px;height:36px;background:linear-gradient(135deg,#4a2e10,#2d1a08);border:1.5px solid var(--gold-dark);
@@ -532,11 +544,25 @@
   <div class="warning-box" style="border-color:#ff8c00;box-shadow:0 0 40px rgba(255,140,0,.4),0 8px 32px rgba(0,0,0,.8)">
     <div class="warning-emoji">🔥</div>
     <div class="warning-pct" style="color:#ff8c00" id="lev-warning-vol">Volatility: --%</div>
-    <div class="warning-title" style="color:#ff8c00;text-shadow:0 0 12px rgba(255,140,0,.4)">Max Leverage Warning</div>
-    <div class="warning-body">This is a <strong style="color:#ffcc88">high volatility pair</strong>. Using 10x leverage means a small price move can wipe your entire margin instantly. Liquidation is very likely.</div>
+    <div class="warning-title" style="color:#ff8c00;text-shadow:0 0 12px rgba(255,140,0,.4)" id="lev-warning-title">Max Leverage Warning</div>
+    <div class="warning-body" id="lev-warning-body">This is a <strong style="color:#ffcc88">high volatility pair</strong>. Using 10x leverage means a small price move can wipe your entire margin instantly. Liquidation is very likely.</div>
     <div class="warning-btns">
       <button class="warning-btn-cancel" onclick="closeLevWarning()">Lower leverage</button>
       <button class="warning-btn-confirm" style="border-color:#ff8c00;background:linear-gradient(135deg,#5c3000,#3d1f00)" onclick="confirmLevTrade()">I understand the risk 🔥</button>
+    </div>
+  </div>
+</div>
+
+<!-- WARNING POPUP — 5x moderate risk -->
+<div class="warning-overlay" id="lev5-warning-overlay">
+  <div class="warning-box" style="border-color:#f0c040;box-shadow:0 0 30px rgba(240,192,64,.3),0 8px 32px rgba(0,0,0,.8)">
+    <div class="warning-emoji">⚠️</div>
+    <div class="warning-pct" style="color:#f0c040" id="lev5-warning-vol">Volatility: --%</div>
+    <div class="warning-title" style="color:#f0c040;text-shadow:0 0 12px rgba(240,192,64,.3)">Elevated Risk — 5x Leverage</div>
+    <div class="warning-body">5x leverage <strong style="color:#ffd966">amplifies both gains and losses by 5x</strong>. A 20% adverse move wipes your full margin. Manageable with a tight Stop Loss — but proceed with caution.</div>
+    <div class="warning-btns">
+      <button class="warning-btn-cancel" onclick="closeLev5Warning()">Lower leverage</button>
+      <button class="warning-btn-confirm" style="border-color:#f0c040;background:linear-gradient(135deg,#4a3800,#2d2200);color:#ffd966" onclick="confirmLev5Trade()">Got it, proceed ⚠️</button>
     </div>
   </div>
 </div>
@@ -562,15 +588,33 @@
       <button class="lot-btn" onclick="adjustLot(1)">+</button>
       <span class="lot-label">lots</span>
     </div>
-    <div class="modal-section-label">Risk Management</div>
+    <div class="modal-section-label">Risk Management <span style="color:#ff9999;font-size:.65rem">(Stop Loss required)</span></div>
     <div class="modal-sltp-row">
       <div class="modal-field">
-        <label class="sl" for="modal-sl">Stop Loss (gp)</label>
-        <input class="modal-input sl" id="modal-sl" type="number" min="1" placeholder="Optional">
+        <label class="sl" for="modal-sl">🛑 Stop Loss %</label>
+        <div style="display:flex;gap:4px;margin-bottom:4px">
+          <button class="sltp-preset sl-preset" onclick="setSlPct(25)">25%</button>
+          <button class="sltp-preset sl-preset" onclick="setSlPct(35)">35%</button>
+          <button class="sltp-preset sl-preset" onclick="setSlPct(50)">50%</button>
+        </div>
+        <div style="position:relative">
+          <input class="modal-input sl" id="modal-sl" type="number" min="0.1" max="99" step="0.1" placeholder="e.g. 5" oninput="updateModalCost()">
+          <span class="sltp-suffix">%</span>
+        </div>
+        <div class="sltp-price-hint" id="sl-price-hint"></div>
       </div>
       <div class="modal-field">
-        <label class="tp" for="modal-tp">Take Profit (gp)</label>
-        <input class="modal-input tp" id="modal-tp" type="number" min="1" placeholder="Optional">
+        <label class="tp" for="modal-tp">🎯 Take Profit %</label>
+        <div style="display:flex;gap:4px;margin-bottom:4px">
+          <button class="sltp-preset tp-preset" onclick="setTpPct(50)">50%</button>
+          <button class="sltp-preset tp-preset" onclick="setTpPct(75)">75%</button>
+          <button class="sltp-preset tp-preset" onclick="setTpPct(100)">100%</button>
+        </div>
+        <div style="position:relative">
+          <input class="modal-input tp" id="modal-tp" type="number" min="0.1" max="999" step="0.1" placeholder="Optional" oninput="updateModalCost()">
+          <span class="sltp-suffix">%</span>
+        </div>
+        <div class="sltp-price-hint" id="tp-price-hint"></div>
       </div>
     </div>
     <div class="modal-cost-info" id="modal-cost-info">
@@ -1376,6 +1420,12 @@ function openModal(itemId) {
   document.getElementById('modal-sl').value  = '';
   document.getElementById('modal-tp').value  = '';
   document.getElementById('modal-lot').value = '1';
+  var slHint = document.getElementById('sl-price-hint');
+  var tpHint = document.getElementById('tp-price-hint');
+  if (slHint) { slHint.textContent = ''; slHint.className = 'sltp-price-hint sl-hint'; }
+  if (tpHint) { tpHint.textContent = ''; tpHint.className = 'sltp-price-hint tp-hint'; }
+  // clear preset active states
+  document.querySelectorAll('.sltp-preset').forEach(function(b){ b.classList.remove('active'); });
   // Reset modalLev to 1 first so setLev(1) computes ratio 1/1 = no change
   modalLev = 1;
   setLev(1);
@@ -1442,6 +1492,35 @@ function getTotalWealth() {
   return wallet + marginLocked + openPnl;
 }
 
+function setSlPct(pct) {
+  document.getElementById('modal-sl').value = pct;
+  document.querySelectorAll('.sl-preset').forEach(function(b){
+    b.classList.toggle('active', parseFloat(b.textContent) === pct);
+  });
+  updateModalCost();
+}
+
+function setTpPct(pct) {
+  document.getElementById('modal-tp').value = pct;
+  document.querySelectorAll('.tp-preset').forEach(function(b){
+    b.classList.toggle('active', parseFloat(b.textContent) === pct);
+  });
+  updateModalCost();
+}
+
+function pctToPrice(entryPrice, pct, dir, side) {
+  // side: 'sl' or 'tp', dir: 'long' or 'short'
+  if (side === 'sl') {
+    return dir === 'long'
+      ? entryPrice * (1 - pct / 100)
+      : entryPrice * (1 + pct / 100);
+  } else {
+    return dir === 'long'
+      ? entryPrice * (1 + pct / 100)
+      : entryPrice * (1 - pct / 100);
+  }
+}
+
 function updateModalCost() {
   var item    = getItem(modalItemId);
   if (!item) return;
@@ -1464,9 +1543,32 @@ function updateModalCost() {
   if (totalEl) totalEl.textContent = fmt(margin + fee) + ' gp';
 
   var pctRow = document.getElementById('modal-pct-row');
-  if (pctRow) {
-    pctRow.textContent = pctStr;
-    pctRow.style.color = pctColor;
+  if (pctRow) { pctRow.textContent = pctStr; pctRow.style.color = pctColor; }
+
+  // Update SL/TP price hints (show both long and short calculated price)
+  var slVal = parseFloat(document.getElementById('modal-sl').value);
+  var tpVal = parseFloat(document.getElementById('modal-tp').value);
+  var slHint = document.getElementById('sl-price-hint');
+  var tpHint = document.getElementById('tp-price-hint');
+
+  if (slHint) {
+    if (!isNaN(slVal) && slVal > 0) {
+      var slLong  = Math.round(pctToPrice(item.price, slVal, 'long',  'sl'));
+      var slShort = Math.round(pctToPrice(item.price, slVal, 'short', 'sl'));
+      slHint.textContent = '▲ ' + fmt(slLong) + ' gp  |  ▼ ' + fmt(slShort) + ' gp';
+    } else {
+      slHint.textContent = '';
+    }
+  }
+
+  if (tpHint) {
+    if (!isNaN(tpVal) && tpVal > 0) {
+      var tpLong  = Math.round(pctToPrice(item.price, tpVal, 'long',  'tp'));
+      var tpShort = Math.round(pctToPrice(item.price, tpVal, 'short', 'tp'));
+      tpHint.textContent = '▲ ' + fmt(tpLong) + ' gp  |  ▼ ' + fmt(tpShort) + ' gp';
+    } else {
+      tpHint.textContent = '';
+    }
   }
 
   var ok = wallet >= (margin + Math.round(margin * 0.01));
@@ -1478,29 +1580,51 @@ function openTrade(dir) {
   var item   = getItem(modalItemId);
   var lots   = getLots();
   var margin = Math.round(item.price * MARGIN_RATE * lots);
-  var fee = Math.round(margin * 0.01);
+  var fee    = Math.round(margin * 0.01);
   if (wallet < margin + fee) { showToast('Not enough gold for margin + fee!', 'error'); return; }
-  var slRaw = document.getElementById('modal-sl').value;
-  var tpRaw = document.getElementById('modal-tp').value;
-  var sl = slRaw ? parseFloat(slRaw) : null;
-  var tp = tpRaw ? parseFloat(tpRaw) : null;
+
+  var slRaw = parseFloat(document.getElementById('modal-sl').value);
+  var tpRaw = parseFloat(document.getElementById('modal-tp').value);
+
+  // SL is required
+  if (isNaN(slRaw) || slRaw <= 0) {
+    showToast('Stop Loss is required — enter a % to protect your position', 'error');
+    document.getElementById('modal-sl').focus();
+    return;
+  }
+  if (slRaw >= 100) { showToast('Stop Loss cannot be 100% or more', 'error'); return; }
+
+  // Convert % to actual gp prices
+  var sl = Math.round(pctToPrice(item.price, slRaw, dir, 'sl') * 100) / 100;
+  var tp = (!isNaN(tpRaw) && tpRaw > 0)
+    ? Math.round(pctToPrice(item.price, tpRaw, dir, 'tp') * 100) / 100
+    : null;
+
+  // Sanity checks (shouldn't fail with pctToPrice but belt-and-braces)
   if (dir === 'long') {
-    if (sl != null && sl >= item.price) { showToast('Stop Loss must be BELOW current price for Long', 'error'); return; }
-    if (tp != null && tp <= item.price) { showToast('Take Profit must be ABOVE current price for Long', 'error'); return; }
+    if (sl >= item.price) { showToast('Stop Loss % too large — would exceed current price', 'error'); return; }
+    if (tp !== null && tp <= item.price) { showToast('Take Profit % too small for Long', 'error'); return; }
   } else {
-    if (sl != null && sl <= item.price) { showToast('Stop Loss must be ABOVE current price for Short', 'error'); return; }
-    if (tp != null && tp >= item.price) { showToast('Take Profit must be BELOW current price for Short', 'error'); return; }
+    if (sl <= item.price) { showToast('Stop Loss % too large — would exceed current price', 'error'); return; }
+    if (tp !== null && tp >= item.price) { showToast('Take Profit % too small for Short', 'error'); return; }
   }
 
-  var wealth     = getTotalWealth();
-  var pctOfPort  = wealth > 0 ? (margin / wealth * 100) : 0;
+  var wealth    = getTotalWealth();
+  var pctOfPort = wealth > 0 ? (margin / wealth * 100) : 0;
 
   pendingTrade = { dir: dir, item: item, margin: margin, lots: lots, sl: sl, tp: tp };
 
-  // Max leverage warning on high volatility pairs (volatility >= 0.08, leverage = 10)
+  // 10x warning on high volatility pairs — most serious
   if (modalLev === 10 && item.volatility >= 0.08) {
     document.getElementById('lev-warning-vol').textContent = 'Volatility: ' + (item.volatility * 100).toFixed(1) + '% per tick';
     document.getElementById('lev-warning-overlay').classList.add('open');
+    return;
+  }
+
+  // 5x warning on all pairs — elevated but not critical
+  if (modalLev === 5) {
+    document.getElementById('lev5-warning-vol').textContent = 'Volatility: ' + (item.volatility * 100).toFixed(1) + '% per tick';
+    document.getElementById('lev5-warning-overlay').classList.add('open');
     return;
   }
 
@@ -1523,7 +1647,8 @@ function executeTrade(trade) {
     lots: trade.lots, sl: trade.sl, tp: trade.tp, fee: fee
   });
   var d = trade.dir === 'long' ? 'Long' : 'Short';
-  showToast(d + ' ' + modalLev + 'x x' + trade.lots + ' opened on ' + trade.item.name + ' @ ' + fmt(trade.item.price) + ' gp (fee: ' + fmt(fee) + ' gp)', trade.dir === 'long' ? 'buy' : 'sell');
+  var slPct = trade.sl ? ' | SL @ ' + fmt(Math.round(trade.sl)) + ' gp' : '';
+  showToast(d + ' ' + modalLev + 'x x' + trade.lots + ' opened — ' + trade.item.name + ' @ ' + fmt(trade.item.price) + ' gp (fee: ' + fmt(fee) + ' gp)' + slPct, trade.dir === 'long' ? 'buy' : 'sell');
   closeModal();
   pendingTrade = null;
   scheduleSave();
@@ -1544,10 +1669,28 @@ function closeLevWarning() {
   pendingTrade = null;
 }
 
+function closeLev5Warning() {
+  document.getElementById('lev5-warning-overlay').classList.remove('open');
+  pendingTrade = null;
+}
+
+function confirmLev5Trade() {
+  document.getElementById('lev5-warning-overlay').classList.remove('open');
+  if (!pendingTrade) return;
+  // Still check position size warning after
+  var wealth    = getTotalWealth();
+  var pctOfPort = wealth > 0 ? (pendingTrade.margin / wealth * 100) : 0;
+  if (pctOfPort >= 50) {
+    document.getElementById('warning-pct').textContent = pctOfPort.toFixed(1) + '% of your portfolio';
+    document.getElementById('warning-overlay').classList.add('open');
+    return;
+  }
+  executeTrade(pendingTrade);
+}
+
 function confirmLevTrade() {
   document.getElementById('lev-warning-overlay').classList.remove('open');
   if (!pendingTrade) return;
-  // Now check position size warning
   var wealth    = getTotalWealth();
   var pctOfPort = wealth > 0 ? (pendingTrade.margin / wealth * 100) : 0;
   if (pctOfPort >= 50) {
@@ -1940,13 +2083,6 @@ function tick() {
   maybeFireEvent();
 
   updatePrices();
-
-  // Strobe charts on every tick
-  ITEMS.forEach(function(item) {
-    var prev = lastPrices[item.id] || item.price;
-    var dir  = item.price >= prev ? 'up' : 'down';
-    strobeChart(item.id, dir);
-  });
 }
 
 // ── LOCAL STORAGE SAVE / LOAD ─────────────────────────────────────────────────
