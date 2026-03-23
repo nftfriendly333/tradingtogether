@@ -421,8 +421,8 @@
   <div class="header-subtitle">Leveraged Commodity Exchange</div>
   <div class="wallet">
     <span>🪙</span>
-    <span class="wallet-value" id="wallet-display">1,000</span>
-    <span style="font-size:.72rem;color:var(--text-dim)">gp</span>
+    <span class="wallet-value" id="wallet-display">10,000</span>
+    <span style="font-size:.72rem;color:var(--text-dim)">PvE</span>
   </div>
   <div id="save-indicator" style="font-size:.58rem;color:rgba(201,169,110,.4);margin-top:3px;letter-spacing:1px">💾 Auto-saving</div>
 </div>
@@ -481,16 +481,16 @@
   <div class="main">
     <div class="portfolio-summary">
       <div class="portfolio-total-label">Total Wealth</div>
-      <div class="portfolio-total" id="port-total">1,000 gp</div>
-      <div class="portfolio-pl" id="port-pl">+0 gp (0.00%)</div>
+      <div class="portfolio-total" id="port-total">10,000 PvE</div>
+      <div class="portfolio-pl" id="port-pl">+0 PvE (0.00%)</div>
       <div class="portfolio-breakdown">
         <div class="portfolio-stat">
           <div class="portfolio-stat-label">💰 Free Cash</div>
-          <div class="portfolio-stat-value" id="port-cash">1,000 gp</div>
+          <div class="portfolio-stat-value" id="port-cash">1,000 PvE</div>
         </div>
         <div class="portfolio-stat">
           <div class="portfolio-stat-label">📊 Open P&amp;L</div>
-          <div class="portfolio-stat-value" id="port-openpl" style="color:var(--text)">0 gp</div>
+          <div class="portfolio-stat-value" id="port-openpl" style="color:var(--text)">0 PvE</div>
         </div>
       </div>
     </div>
@@ -576,10 +576,10 @@
     <div class="modal-section-label">Leverage</div>
     <div class="modal-lev-row">
       <div class="modal-lev-btn active" data-lev="1" onclick="setLev(1)">1x</div>
-      <div class="modal-lev-btn" data-lev="2" onclick="setLev(2)">2x</div>
       <div class="modal-lev-btn" data-lev="3" onclick="setLev(3)">3x</div>
       <div class="modal-lev-btn" data-lev="5" onclick="setLev(5)">5x</div>
       <div class="modal-lev-btn" data-lev="10" onclick="setLev(10)">10x</div>
+      <div class="modal-lev-btn" data-lev="25" onclick="setLev(25)">25x</div>
     </div>
     <div class="modal-section-label">Lot Size</div>
     <div class="modal-lot-row">
@@ -639,22 +639,25 @@
 
 <script>
 var ITEMS = [
-  { id:'sword',  name:'Dragon Longsword',    desc:'A fearsome blade of dragonite',    icon:'⚔️', price:220, basePrice:220, volatility:0.0594, trend:0.001,  history:[], candles:[], candleTickBuf:[] },
-  { id:'rune',   name:'Fire Rune Bundle',    desc:'Ancient runes pulsing with flame', icon:'🔥', price:85,  basePrice:85,  volatility:0.0950, trend:-0.001, history:[], candles:[], candleTickBuf:[] },
-  { id:'potion', name:'Super Restore Potion',desc:'Restores stats drained in battle', icon:'🧪', price:150, basePrice:150, volatility:0.0475, trend:0.002,  history:[], candles:[], candleTickBuf:[] },
-  { id:'gem',    name:'Onyx Gem',            desc:'Rare gemstone from deep mines',    icon:'💎', price:310, basePrice:310, volatility:0,       trend:0,      history:[], candles:[], candleTickBuf:[] },
-  { id:'hide',   name:'Dragon Leather Hide', desc:'Tanned hide of a slain dragon',   icon:'🐉', price:175, basePrice:175, volatility:0,       trend:0,      history:[], candles:[], candleTickBuf:[] },
-  { id:'arrow',  name:'Rune Arrow Bundle',   desc:'Magically tipped arrows of rune', icon:'🏹', price:55,  basePrice:55,  volatility:0,       trend:0,      history:[], candles:[], candleTickBuf:[] }
+  { id:'sword',  name:'Dragon Longsword',    desc:'A fearsome blade of dragonite',    icon:'⚔️', price:220, basePrice:220, volatility:0, trend:0, history:[], candles:[], candleTickBuf:[] },
+  { id:'rune',   name:'Fire Rune Bundle',    desc:'Ancient runes pulsing with flame', icon:'🔥', price:85,  basePrice:85,  volatility:0, trend:0, history:[], candles:[], candleTickBuf:[] },
+  { id:'potion', name:'Super Restore Potion',desc:'Restores stats drained in battle', icon:'🧪', price:150, basePrice:150, volatility:0, trend:0, history:[], candles:[], candleTickBuf:[] },
+  { id:'gem',    name:'Onyx Gem',            desc:'Rare gemstone from deep mines',    icon:'💎', price:310, basePrice:310, volatility:0, trend:0, history:[], candles:[], candleTickBuf:[] },
+  { id:'hide',   name:'Dragon Leather Hide', desc:'Tanned hide of a slain dragon',   icon:'🐉', price:175, basePrice:175, volatility:0, trend:0, history:[], candles:[], candleTickBuf:[] },
+  { id:'arrow',  name:'Rune Arrow Bundle',   desc:'Magically tipped arrows of rune', icon:'🏹', price:55,  basePrice:55,  volatility:0, trend:0, history:[], candles:[], candleTickBuf:[] }
 ];
 
-// Randomize volatility, trend, and starting price for the 3 new items at startup
+// Randomize volatility, trend, and starting price for all 6 items at startup
 (function() {
-  var newItems = [
+  var allItems = [
+    { id:'sword', priceMin:150, priceMax:350 },
+    { id:'rune',  priceMin:50,  priceMax:150 },
+    { id:'potion',priceMin:80,  priceMax:250 },
     { id:'gem',   priceMin:200, priceMax:450 },
     { id:'hide',  priceMin:80,  priceMax:280 },
     { id:'arrow', priceMin:20,  priceMax:120 }
   ];
-  newItems.forEach(function(cfg) {
+  allItems.forEach(function(cfg) {
     var item = ITEMS.filter(function(i){ return i.id === cfg.id; })[0];
     item.price      = Math.round(cfg.priceMin + Math.random() * (cfg.priceMax - cfg.priceMin));
     item.basePrice  = item.price;
@@ -667,7 +670,7 @@ var MAX_HISTORY       = 60;
 var TICK_MS           = 2000;
 var CANDLE_TICKS      = 3;
 var MA_PERIOD         = 20;
-var STARTING_GP       = 1000;
+var STARTING_GP       = 10000;
 var MARGIN_RATE       = 0.2;
 var TREND_SHIFT_TICKS = 150;
 var WARNING_TICKS     = 25;
@@ -783,8 +786,8 @@ function checkSLTP() {
     wallet += Math.max(0, pos.margin + pnl);
     positions = positions.filter(function(p) { return p.id !== pos.id; });
     var d = pos.direction === 'long' ? 'Long' : 'Short';
-    if (reason === 'sl')       showToast('Stop Loss hit — ' + d + ' ' + item.name + ' | ' + fmtPnl(Math.round(pnl)) + ' gp', 'sl-hit');
-    else if (reason === 'tp')  showToast('Take Profit hit — ' + d + ' ' + item.name + ' | +' + fmt(Math.round(pnl)) + ' gp', 'tp-hit');
+    if (reason === 'sl')       showToast('Stop Loss hit — ' + d + ' ' + item.name + ' | ' + fmtPnl(Math.round(pnl)) + ' PvE', 'sl-hit');
+    else if (reason === 'tp')  showToast('Take Profit hit — ' + d + ' ' + item.name + ' | +' + fmt(Math.round(pnl)) + ' PvE', 'tp-hit');
     else                       showToast('Liquidated: ' + d + ' ' + item.name, 'error');
   });
 }
@@ -834,7 +837,7 @@ function checkPriceCeiling() {
         var oldCard = document.getElementById('card-' + item.id);
         if (oldCard) oldCard.parentNode.removeChild(oldCard);
 
-        showToast(item.icon + ' ' + item.name + ' suspended & reset to ' + fmt(item.basePrice) + ' gp' + (toClose.length ? ' | Positions closed: ' + fmtPnl(Math.round(totalPnl)) + ' gp' : ''), 'error');
+        showToast(item.icon + ' ' + item.name + ' suspended & reset to ' + fmt(item.basePrice) + ' PvE' + (toClose.length ? ' | Positions closed: ' + fmtPnl(Math.round(totalPnl)) + ' PvE' : ''), 'error');
         scheduleSave();
       }
       return;
@@ -849,7 +852,7 @@ function checkPriceCeiling() {
       var label = document.getElementById('bn-label');
       if (bar)   { bar.style.background = 'linear-gradient(135deg,#4a2a00,#7a4a00,#4a2a00)'; bar.style.borderBottomColor = '#ff8c00'; }
       if (label) { label.style.background = '#8a4a00'; label.textContent = '⚠️ Suspended'; }
-      document.getElementById('bn-headline').textContent = item.icon + '  ' + item.name + ' hit price ceiling of 7,000 gp!';
+      document.getElementById('bn-headline').textContent = item.icon + '  ' + item.name + ' hit price ceiling of 7,000 PvE!';
       document.getElementById('bn-sub').textContent      = 'All positions will be closed automatically — asset resetting to base price';
       document.getElementById('bn-countdown').textContent = CEILING_WARN_TICKS + ' ticks';
       document.getElementById('breaking-news').classList.add('show');
@@ -921,7 +924,6 @@ function startEvent(type) {
 
   activeEvent   = { type: type, itemId: item.id, ticksLeft: ticks, perTick: perTick, totalPct: totalPct, ticks: ticks };
   lastEventType = type;
-  showEventBanner(type, item, ticks, totalPct);
 }
 
 function showEventBanner(type, item, ticks, eventPct) {
@@ -980,12 +982,6 @@ function applyEventPrices() {
     activeEvent = null;
     resetBannerStyle();
     dismissNews();
-
-    if (doneType === 'surge') {
-      showToast(doneName + ' surge complete! +' + '-- gp', 'tp-hit');
-    } else {
-      showToast(doneName + ' crash complete!', 'sl-hit');
-    }
 
     // Schedule next event: 20-50 ticks cooldown, then alternate type
     nextEventAt = tickCount + 20 + Math.floor(Math.random() * 30);
@@ -1048,7 +1044,7 @@ function closeAllPositions() {
     wallet += Math.max(0, pos.margin + pnl);
   });
   positions = [];
-  showToast('Closed ' + count + ' position' + (count > 1 ? 's' : '') + ' | ' + fmtPnl(Math.round(totalPnl)) + ' gp total', totalPnl >= 0 ? 'buy' : 'sell');
+  showToast('Closed ' + count + ' position' + (count > 1 ? 's' : '') + ' | ' + fmtPnl(Math.round(totalPnl)) + ' PvE total', totalPnl >= 0 ? 'buy' : 'sell');
   scheduleSave();
   renderAll();
 }
@@ -1065,7 +1061,7 @@ function closeItemPositions(itemId) {
     wallet += Math.max(0, pos.margin + pnl);
   });
   positions = positions.filter(function(p){ return p.itemId !== itemId; });
-  showToast('Closed ' + item.name + ' positions | ' + fmtPnl(Math.round(totalPnl)) + ' gp', totalPnl >= 0 ? 'buy' : 'sell');
+  showToast('Closed ' + item.name + ' positions | ' + fmtPnl(Math.round(totalPnl)) + ' PvE', totalPnl >= 0 ? 'buy' : 'sell');
   scheduleSave();
   renderAll();
 }
@@ -1106,6 +1102,9 @@ function drawCandleChart(el, candles, miniMode, item) {
   ctx.clearRect(0, 0, w, h);
 
   if (!candles || candles.length < 2) return;
+
+  // Only show last 40 candles for cleaner analysis
+  candles = candles.slice(-40);
 
   var padT = (miniMode ? 6 : 18) * dpr;
   var padB = (miniMode ? 6 : 22) * dpr;
@@ -1512,16 +1511,16 @@ function pctToPrice(entryPrice, pct, dir, side, margin, leverage, lots) {
   // pct is % of margin (e.g. 25 = lose/gain 25% of margin)
   // units = how many "shares" the position controls
   var units = (margin / entryPrice) * leverage;
-  var gpMove = (margin * pct / 100) / units; // price move needed to hit that margin %
+  var PvEMove = (margin * pct / 100) / units; // price move needed to hit that margin %
 
   if (side === 'sl') {
     return dir === 'long'
-      ? entryPrice - gpMove
-      : entryPrice + gpMove;
+      ? entryPrice - PvEMove
+      : entryPrice + PvEMove;
   } else {
     return dir === 'long'
-      ? entryPrice + gpMove
-      : entryPrice - gpMove;
+      ? entryPrice + PvEMove
+      : entryPrice - PvEMove;
   }
 }
 
@@ -1536,15 +1535,15 @@ function updateModalCost() {
   var pctStr   = pctOfPort.toFixed(1) + '% of portfolio';
   var pctColor = pctOfPort >= 50 ? '#ff6b6b' : pctOfPort >= 25 ? '#f0c040' : 'var(--green)';
 
-  document.getElementById('modal-price-display').innerHTML = 'Current Price: <strong>' + fmt(item.price) + ' gp</strong>';
-  document.getElementById('modal-margin').textContent   = fmt(margin) + ' gp';
-  document.getElementById('modal-notional').textContent = fmt(notional) + ' gp (' + modalLev + 'x, ' + lots + ' lot' + (lots > 1 ? 's' : '') + ')';
-  document.getElementById('modal-cash').textContent     = fmt(wallet) + ' gp';
+  document.getElementById('modal-price-display').innerHTML = 'Current Price: <strong>' + fmt(item.price) + ' PvE</strong>';
+  document.getElementById('modal-margin').textContent   = fmt(margin) + ' PvE';
+  document.getElementById('modal-notional').textContent = fmt(notional) + ' PvE (' + modalLev + 'x, ' + lots + ' lot' + (lots > 1 ? 's' : '') + ')';
+  document.getElementById('modal-cash').textContent     = fmt(wallet) + ' PvE';
   var fee = Math.round(margin * 0.01);
   var feeEl = document.getElementById('modal-fee');
-  if (feeEl) feeEl.textContent = fmt(fee) + ' gp (1%)';
+  if (feeEl) feeEl.textContent = fmt(fee) + ' PvE (1%)';
   var totalEl = document.getElementById('modal-total-cost');
-  if (totalEl) totalEl.textContent = fmt(margin + fee) + ' gp';
+  if (totalEl) totalEl.textContent = fmt(margin + fee) + ' PvE';
 
   var pctRow = document.getElementById('modal-pct-row');
   if (pctRow) { pctRow.textContent = pctStr; pctRow.style.color = pctColor; }
@@ -1559,7 +1558,7 @@ function updateModalCost() {
     if (!isNaN(slVal) && slVal > 0) {
       var slLong  = Math.round(pctToPrice(item.price, slVal, 'long',  'sl', margin, modalLev, lots));
       var slShort = Math.round(pctToPrice(item.price, slVal, 'short', 'sl', margin, modalLev, lots));
-      slHint.textContent = '▲ ' + fmt(slLong) + ' gp  |  ▼ ' + fmt(slShort) + ' gp';
+      slHint.textContent = '▲ ' + fmt(slLong) + ' PvE  |  ▼ ' + fmt(slShort) + ' PvE';
     } else {
       slHint.textContent = '';
     }
@@ -1569,7 +1568,7 @@ function updateModalCost() {
     if (!isNaN(tpVal) && tpVal > 0) {
       var tpLong  = Math.round(pctToPrice(item.price, tpVal, 'long',  'tp', margin, modalLev, lots));
       var tpShort = Math.round(pctToPrice(item.price, tpVal, 'short', 'tp', margin, modalLev, lots));
-      tpHint.textContent = '▲ ' + fmt(tpLong) + ' gp  |  ▼ ' + fmt(tpShort) + ' gp';
+      tpHint.textContent = '▲ ' + fmt(tpLong) + ' PvE  |  ▼ ' + fmt(tpShort) + ' PvE';
     } else {
       tpHint.textContent = '';
     }
@@ -1598,7 +1597,7 @@ function openTrade(dir) {
   }
   if (slRaw >= 100) { showToast('Stop Loss cannot be 100% or more', 'error'); return; }
 
-  // Convert % of margin to actual gp prices
+  // Convert % of margin to actual PvE prices
   var sl = Math.round(pctToPrice(item.price, slRaw, dir, 'sl', margin, modalLev, lots) * 100) / 100;
   var tp = (!isNaN(tpRaw) && tpRaw > 0)
     ? Math.round(pctToPrice(item.price, tpRaw, dir, 'tp', margin, modalLev, lots) * 100) / 100
@@ -1619,7 +1618,7 @@ function openTrade(dir) {
   pendingTrade = { dir: dir, item: item, margin: margin, lots: lots, sl: sl, tp: tp };
 
   // 10x warning on high volatility pairs — most serious
-  if (modalLev === 10 && item.volatility >= 0.08) {
+  if (modalLev >= 10 && item.volatility >= 0.08) {
     document.getElementById('lev-warning-vol').textContent = 'Volatility: ' + (item.volatility * 100).toFixed(1) + '% per tick';
     document.getElementById('lev-warning-overlay').classList.add('open');
     return;
@@ -1651,8 +1650,8 @@ function executeTrade(trade) {
     lots: trade.lots, sl: trade.sl, tp: trade.tp, fee: fee
   });
   var d = trade.dir === 'long' ? 'Long' : 'Short';
-  var slPct = trade.sl ? ' | SL @ ' + fmt(Math.round(trade.sl)) + ' gp' : '';
-  showToast(d + ' ' + modalLev + 'x x' + trade.lots + ' opened — ' + trade.item.name + ' @ ' + fmt(trade.item.price) + ' gp (fee: ' + fmt(fee) + ' gp)' + slPct, trade.dir === 'long' ? 'buy' : 'sell');
+  var slPct = trade.sl ? ' | SL @ ' + fmt(Math.round(trade.sl)) + ' PvE' : '';
+  showToast(d + ' ' + modalLev + 'x x' + trade.lots + ' opened — ' + trade.item.name + ' @ ' + fmt(trade.item.price) + ' PvE (fee: ' + fmt(fee) + ' PvE)' + slPct, trade.dir === 'long' ? 'buy' : 'sell');
   closeModal();
   pendingTrade = null;
   scheduleSave();
@@ -1714,7 +1713,7 @@ function closePosition(posId) {
   wallet  += Math.max(0, pos.margin + pnl);
   positions = positions.filter(function(p){ return p.id !== posId; });
   var d = pos.direction === 'long' ? 'Long' : 'Short';
-  showToast('Closed ' + d + ' ' + item.name + ': ' + fmtPnl(Math.round(pnl)) + ' gp', pnl >= 0 ? 'buy' : 'sell');
+  showToast('Closed ' + d + ' ' + item.name + ': ' + fmtPnl(Math.round(pnl)) + ' PvE', pnl >= 0 ? 'buy' : 'sell');
   scheduleSave();
   renderAll();
 }
@@ -1771,7 +1770,7 @@ function renderMarket() {
       h +=     '<div class="item-desc">' + item.desc + '</div>';
       h +=   '</div>';
       h +=   '<div class="item-price-block">';
-      h +=     '<div class="item-price" id="price-' + item.id + '">' + fmt(item.price) + ' gp</div>';
+      h +=     '<div class="item-price" id="price-' + item.id + '">' + fmt(item.price) + ' PvE</div>';
       h +=     '<div class="item-change" id="change-' + item.id + '"></div>';
       h +=   '</div>';
       h += '</div>';
@@ -1786,7 +1785,7 @@ function renderMarket() {
     }
 
     var priceEl = document.getElementById('price-' + item.id);
-    priceEl.textContent = fmt(item.price) + ' gp';
+    priceEl.textContent = fmt(item.price) + ' PvE';
     priceEl.className = 'item-price ' + dir;
     setTimeout(function(){ priceEl.className = 'item-price'; }, 800);
 
@@ -1815,7 +1814,7 @@ function renderMarket() {
         bars += '<span style="font-size:.66rem;color:var(--text-dim)">@' + fmt(pos.entryPrice) + '</span>';
         if (pos.sl != null) bars += '<span style="font-size:.64rem;color:#ff9999">SL:' + fmt(pos.sl) + '</span>';
         if (pos.tp != null) bars += '<span style="font-size:.64rem;color:#99ffcc">TP:' + fmt(pos.tp) + '</span>';
-        bars += '<span class="pos-pnl ' + pnlClass + '">' + fmtPnl(Math.round(pnl)) + ' gp</span>';
+        bars += '<span class="pos-pnl ' + pnlClass + '">' + fmtPnl(Math.round(pnl)) + ' PvE</span>';
         bars += '</div>';
       });
       posbar.innerHTML = bars;
@@ -1861,13 +1860,13 @@ function renderPortfolio() {
   var pl     = total - STARTING_GP;
   var plPct  = pct(total, STARTING_GP);
 
-  document.getElementById('port-total').textContent = fmt(total) + ' gp';
-  document.getElementById('port-cash').textContent  = fmt(wallet) + ' gp';
+  document.getElementById('port-total').textContent = fmt(total) + ' PvE';
+  document.getElementById('port-cash').textContent  = fmt(wallet) + ' PvE';
   var openPlEl = document.getElementById('port-openpl');
-  openPlEl.textContent  = fmtPnl(Math.round(openPnl)) + ' gp';
+  openPlEl.textContent  = fmtPnl(Math.round(openPnl)) + ' PvE';
   openPlEl.style.color  = openPnl >= 0 ? 'var(--green)' : 'var(--red)';
   var plEl = document.getElementById('port-pl');
-  plEl.textContent = fmtPnl(Math.round(pl)) + ' gp (' + fmtPct(plPct) + ')';
+  plEl.textContent = fmtPnl(Math.round(pl)) + ' PvE (' + fmtPct(plPct) + ')';
   plEl.className   = 'portfolio-pl ' + (pl >= 0 ? 'pos' : 'neg');
 
   var list = document.getElementById('positions-list');
@@ -1887,17 +1886,17 @@ function renderPortfolio() {
     var pnlClass  = pnl >= 0 ? 'pos' : 'neg';
     var retColor  = pnlPct >= 0 ? 'var(--green)' : 'var(--red)';
     var slTag     = pos.sl != null
-      ? '<span class="order-tag sl">SL: ' + fmt(pos.sl) + ' gp</span>'
+      ? '<span class="order-tag sl">SL: ' + fmt(pos.sl) + ' PvE</span>'
       : '<span class="order-tag none">No Stop Loss</span>';
     var tpTag     = pos.tp != null
-      ? '<span class="order-tag tp">TP: ' + fmt(pos.tp) + ' gp</span>'
+      ? '<span class="order-tag tp">TP: ' + fmt(pos.tp) + ' PvE</span>'
       : '<span class="order-tag none">No Take Profit</span>';
 
     html += '<div class="position-card ' + cardClass + '">';
     html +=   '<div class="pos-card-top">';
     html +=     '<div class="pos-icon">' + item.icon + '</div>';
     html +=     '<div class="pos-card-name">' + item.name + '</div>';
-    html +=     '<div class="pos-card-pnl ' + pnlClass + '">' + fmtPnl(Math.round(pnl)) + ' gp</div>';
+    html +=     '<div class="pos-card-pnl ' + pnlClass + '">' + fmtPnl(Math.round(pnl)) + ' PvE</div>';
     html +=   '</div>';
     html +=   '<div class="pos-card-details">';
     html +=     '<div class="pos-card-detail">' + dirLabel + ' <span>' + pos.leverage + 'x</span></div>';
@@ -1906,8 +1905,8 @@ function renderPortfolio() {
     html +=   '</div>';
     html +=   '<div class="pos-card-details">';
     html +=     '<div class="pos-card-detail">Now <span>' + fmt(item.price) + '</span></div>';
-    html +=     '<div class="pos-card-detail">Margin <span>' + fmt(pos.margin) + ' gp</span></div>';
-    html +=     '<div class="pos-card-detail">Fee paid <span style="color:#ff9999">' + fmt(pos.fee || 0) + ' gp</span></div>';
+    html +=     '<div class="pos-card-detail">Margin <span>' + fmt(pos.margin) + ' PvE</span></div>';
+    html +=     '<div class="pos-card-detail">Fee paid <span style="color:#ff9999">' + fmt(pos.fee || 0) + ' PvE</span></div>';
     html +=     '<div class="pos-card-detail">Return <span style="color:' + retColor + '">' + fmtPct(pnlPct) + '</span></div>';
     html +=   '</div>';
     html +=   '<div class="pos-card-orders">' + slTag + tpTag + '</div>';
@@ -1968,7 +1967,7 @@ function renderHistory() {
   var stats = '';
   stats += '<div class="hist-stat-card wide">';
   stats +=   '<div class="hist-stat-label">Total Realised P&amp;L</div>';
-  stats +=   '<div class="hist-stat-value ' + plClass + '">' + fmtPnl(totalPnl) + ' gp</div>';
+  stats +=   '<div class="hist-stat-value ' + plClass + '">' + fmtPnl(totalPnl) + ' PvE</div>';
   stats +=   '<div class="hist-stat-sub">' + tradeHistory.length + ' ' + tradeWord + ' closed</div>';
   stats += '</div>';
   stats += '<div class="hist-stat-card">';
@@ -1984,15 +1983,15 @@ function renderHistory() {
   stats +=     '<span style="color:var(--text-dim);font-size:.75rem"> / </span>';
   stats +=     '<span style="color:var(--red)">' + avgLossStr + '</span>';
   stats +=   '</div>';
-  stats +=   '<div class="hist-stat-sub">gp per trade</div>';
+  stats +=   '<div class="hist-stat-sub">PvE per trade</div>';
   stats += '</div>';
   stats += '<div class="hist-stat-card">';
   stats +=   '<div class="hist-stat-label">Best Trade</div>';
-  stats +=   '<div class="hist-stat-value pos">+' + fmt(bestTrade) + ' gp</div>';
+  stats +=   '<div class="hist-stat-value pos">+' + fmt(bestTrade) + ' PvE</div>';
   stats += '</div>';
   stats += '<div class="hist-stat-card">';
   stats +=   '<div class="hist-stat-label">Worst Trade</div>';
-  stats +=   '<div class="hist-stat-value neg">' + fmt(worstTrade) + ' gp</div>';
+  stats +=   '<div class="hist-stat-value neg">' + fmt(worstTrade) + ' PvE</div>';
   stats += '</div>';
   statsEl.innerHTML = stats;
 
@@ -2039,12 +2038,12 @@ function renderHistory() {
     rows +=     '<div class="hist-details">';
     rows +=       '<span>Entry <span class="val">' + fmt(t.entryPrice) + '</span></span>';
     rows +=       '<span>Exit <span class="val">' + fmt(t.exitPrice) + '</span> <span style="color:' + diffColor + '">(' + diffStr + ')</span></span>';
-    rows +=       '<span>Margin <span class="val">' + fmt(t.margin) + ' gp</span></span>';
+    rows +=       '<span>Margin <span class="val">' + fmt(t.margin) + ' PvE</span></span>';
     rows +=     '</div>';
     rows +=     '<div class="hist-time">' + timeAgo(t.closedAt) + '</div>';
     rows +=   '</div>';
     rows +=   '<div>';
-    rows +=     '<div class="hist-pnl ' + pnlClass + '">' + fmtPnl(t.pnl) + ' gp</div>';
+    rows +=     '<div class="hist-pnl ' + pnlClass + '">' + fmtPnl(t.pnl) + ' PvE</div>';
     rows +=     '<div class="hist-pnl-pct ' + pctClass + '">' + pnlPctStr + '</div>';
     rows +=   '</div>';
     rows += '</div>';
@@ -2175,7 +2174,7 @@ function loadState() {
 }
 
 function resetState() {
-  if (!confirm('Reset everything and start with 1,000 gp? This cannot be undone.')) return;
+  if (!confirm('Reset everything and start with 1,000 PvE? This cannot be undone.')) return;
   try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
   wallet       = STARTING_GP;
   positions    = [];
@@ -2194,7 +2193,7 @@ function resetState() {
     for (var j = 0; j < 15; j++) item.candles.push({ o: item.price, h: item.price, l: item.price, c: item.price });
   });
   renderAll();
-  showToast('Fresh start! 1,000 gp loaded.', 'buy');
+  showToast('Fresh start! 1,000 PvE loaded.', 'buy');
 }
 
 // Debounced auto-save every 5 seconds after any state change
