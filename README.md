@@ -151,6 +151,13 @@
   .chart-stat-val{font-family:'Cinzel',serif;font-size:.75rem;color:var(--text);font-weight:600;margin-top:2px}
 
 
+  .btn-reset-funds{display:block;width:100%;background:linear-gradient(135deg,#3a1a05,#2a0f03);
+    border:2px solid var(--gold-dark);border-radius:8px;padding:12px;
+    font-family:'Cinzel',serif;font-size:.82rem;font-weight:700;color:var(--gold);
+    cursor:pointer;transition:all .15s;text-align:center;letter-spacing:1px;text-transform:uppercase}
+  .btn-reset-funds:hover{background:linear-gradient(135deg,#4a2e10,#2d1a08);box-shadow:0 0 12px rgba(240,192,64,.2)}
+  .btn-reset-funds:active{transform:scale(.97)}
+
   /* HISTORY */
   .hist-stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:14px}
   .hist-stat-card{background:linear-gradient(135deg,var(--panel-light),var(--panel));border:1.5px solid var(--border);
@@ -522,6 +529,10 @@
       </div>
     </div>
     <div id="history-list"></div>
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(107,74,34,.3)">
+      <button class="btn-reset-funds" onclick="resetFundsAndHistory()">↺ Reset Funds &amp; History</button>
+      <div style="font-size:.7rem;color:var(--text-dim);text-align:center;margin-top:6px;font-style:italic">Closes all positions and restarts with 10,000 PvE</div>
+    </div>
   </div>
 </div>
 
@@ -2088,7 +2099,31 @@ function tick() {
   updatePrices();
 }
 
-// ── LOCAL STORAGE SAVE / LOAD ─────────────────────────────────────────────────
+function resetFundsAndHistory() {
+  if (!confirm('Reset to 10,000 PvE and clear all trade history? Open positions will be closed. This cannot be undone.')) return;
+
+  // Close all open positions at current market price
+  positions.forEach(function(pos) {
+    var item = getItem(pos.itemId);
+    var pnl  = calcPnl(pos, item.price);
+    wallet += Math.max(0, pos.margin + pnl);
+  });
+  positions = [];
+
+  // Reset funds and history
+  wallet       = STARTING_GP;
+  tradeHistory = [];
+  posIdCounter = 0;
+
+  // Clear saved state
+  try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
+  scheduleSave();
+
+  renderAll();
+  showPage('market');
+  showToast('Fresh start! 10,000 PvE loaded.', 'tp-hit');
+}
+
 var SAVE_KEY = 'tradeTogether_v1';
 var saveTimer = null;
 
